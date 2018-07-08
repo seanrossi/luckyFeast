@@ -1,0 +1,19 @@
+{% load static %}
+<html>
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/navbar.css' %}">
+<div class="navbar">
+<div class="navbar_left">
+<ul>
+    <li><b><a href='{% url 'potlucks:event_index' %}'>My Events</a></b></li>
+    <li><b><a href='{% url 'potlucks:create_event' %}'>Create Event</a></b></li>
+    <li><b><a href=''>Recipes</a></b></li>
+</ul>   
+</div>
+<div class="navbar_right">
+<ul>
+    <li><b><a href='{% url 'potlucks:user_register' %}'>Register</a></b></li>
+    <li><b><a href='{% url 'potlucks:user_login' %}'>Login</a></b></li>
+</ul>
+</div>
+</div>
+</html>

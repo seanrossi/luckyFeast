@@ -1,0 +1,30 @@
+{% include "potlucks/navbar.html" %}
+{% load static %}
+<html>
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/forms.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
+<div class="main">
+<h1>This is the user registration page</h1>
+
+<div class="forms">
+<form action="{% url 'potlucks:user_enter' %}">
+<ul>
+    <!--Each input has a title, a help hover key, and a helper message-->
+    <li><b>Username:
+    <div class="forms-help-key">?</b>
+    <div class="forms-help">Enter Username</div></div><br>
+    <input type="text" name="username" /></li>
+    
+    <li><b>Password:
+    <div class="forms-help-key">?</b>
+    <div class="forms-help">Password must be at least 6 characters long and must contain 1 number</div></div><br>
+    <input type="password" name="password" /></li>
+
+    <li><b>Email:
+    <div class="forms-help-key">?</b>
+    <div class="forms-help">Email must be in form of name@email.com</div></div><br>
+    <input type="text" name="email" /></li>
+    <li><input type="submit" value="Register" /></li>
+</form>
+</div>
+</div>
