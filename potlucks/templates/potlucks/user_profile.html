@@ -1,0 +1,10 @@
+{% load static %}
+{% include "potlucks/navbar.html" %}
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
+<html>
+<div class="main">
+<h1>This is the profile of {{ request.user.username }}</h1>
+</div>
+
+
+</html>

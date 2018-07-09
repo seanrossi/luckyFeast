@@ -1,0 +1,17 @@
+{% load static %}
+{% include "potlucks/navbar.html" %}
+<html>
+<h1>Add Dishes to {{ event.name }}</h1>
+<h2>Current Dishes:</h2>
+<h2>Add New Dish:</h2>
+<ul>
+    {% for type in dish_types %}
+    <li>{{ type.main_type }}</li>
+    <select name="dish_type">
+    {% for sub in type.dish_type_sub_set.all %}
+    <option value="{{ sub.sub_type }}">{{ sub.sub_type }}</option>
+    {% endfor %}
+    </select>
+    {% endfor %}
+</ul>
+</html>

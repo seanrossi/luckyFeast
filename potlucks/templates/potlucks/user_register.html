@@ -7,7 +7,8 @@
 <h1>This is the user registration page</h1>
 
 <div class="forms">
-<form action="{% url 'potlucks:user_enter' %}">
+<form action="{% url 'potlucks:user_enter' %}" method='POST'>
+{% csrf_token %}
 <ul>
     <!--Each input has a title, a help hover key, and a helper message-->
     <li><b>Username:
@@ -24,6 +25,7 @@
     <div class="forms-help-key">?</b>
     <div class="forms-help">Email must be in form of name@email.com</div></div><br>
     <input type="text" name="email" /></li>
+    
     <li><input type="submit" value="Register" /></li>
 </form>
 </div>

@@ -1,28 +1,110 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from .models import Event, Dish_Type_Main
+import datetime
 
 def index(request):
     return render(request, 'potlucks/index.html')
 
 def user_login(request):
+    request.session['target_view'] = 'potlucks:event_index'
     return render(request, 'potlucks/user_login.html')
 
+def user_logout(request):
+    logout(request)
+    return render(request, 'potlucks/index.html')
+
 def user_auth(request):
-    return render(request, 'potlucks/user_auth.html')
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        login(request, user)
+        return HttpResponseRedirect(reverse(request.session['target_view']))
+    else:
+        context = {'error_message': "User and/or password not found"}
+        return render(request, 'potlucks/user_login.html', context)
 
 def user_register(request):
-    return render(request, 'potlucks/user_register.html')
+    userList = User.objects.all()
+    context = {'userList': userList}
+    return render(request, 'potlucks/user_register.html', context)
 
 def user_enter(request):
-    return render(request, 'potlucks/user_enter.html')
+    username = request.POST['username']
+    password = request.POST['password']
+    email = request.POST['email']
 
-def event_index(request):
+    user = User.objects.create_user(username, email, password)
+    login(request, user)
     return render(request, 'potlucks/event_index.html')
 
+def user_profile(request):
+    return render(request, 'potlucks/user_profile.html')
+
+def event_index(request):
+    if not request.user.is_authenticated:
+        request.session['target_view'] = 'potlucks:event_index'
+        return render(request, 'potlucks/user_login.html')
+    user = request.user
+    event_list = user.event_set.all()
+    invited_list = user.guest_instance_set.all()
+    context = {'event_list': event_list, 'invited_list': invited_list}
+    return render(request, 'potlucks/event_index.html', context)
+
 def create_event(request):
-    return render(request, 'potlucks/create_event.html')
+    if not request.user.is_authenticated:
+        request.session['target_view'] = 'potlucks:create_event'
+        return render(request, 'potlucks/user_login.html')
+    context = {'days':range(1, 32), 'hours':range(12), 'minutes':range(60)}
+    return render(request, 'potlucks/create_event.html', context)
 
 def event_details(request):
     return render(request, 'potlucks/event_details.html')
 
+def event_enter(request):
+    user = request.user
+    event_name = request.POST['event_name']
+    
+    startMonth = request.POST['startMonth']
+    startDate = request.POST['startDate']
+    startYear = request.POST['startYear']
+    startHour = int(request.POST['startHour'])
+    startMinutes = request.POST['startMinutes']
+    startAm = request.POST['startAm']
+    if startAm == "pm":
+        startHour += 12
+    start = datetime.datetime(int(startYear), int(startMonth), int(startDate), int(startHour), int(startMinutes))    
+
+    endMonth = request.POST['endMonth']
+    endDate = request.POST['endDate']
+    endYear = request.POST['endYear']
+    endHour = int(request.POST['endHour'])
+    endMinutes = request.POST['endMinutes']
+    endAm = request.POST['endAm']
+    if endAm == "pm":
+        endHour += 12
+    end = datetime.datetime(int(endYear), int(endMonth), int(endDate), int(endHour), int(endMinutes))    
+
+    address = request.POST['address']
+    apt = request.POST['apt']
+    city = request.POST['city']
+    state = request.POST['state']
+    zipcode = request.POST['zipcode']
+
+    event = user.event_set.create(name=event_name, host=request.user, start_time=start, end_time=end, address=address, apt=apt, city=city, state=state, zipcode=zipcode)
+    dish_types = Dish_Type_Main.objects.all()
+    context = {'event': event, 'dish_types':dish_types}
+    return render(request, 'potlucks/event_dishes.html', context)
+
+def event_dishes(request):
+    user = request.user
+    event_id = request.GET['id']
+    event = Event.objects.get(pk=event_id)
+    dish_types = Dish_Type_Main.objects.all()
+    context = {'event': event, 'dish_types':dish_types}
+    return render(request, 'potlucks/event_dishes.html', context)
 # Create your views here.

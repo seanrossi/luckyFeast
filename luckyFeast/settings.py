@@ -25,18 +25,21 @@ SECRET_KEY = '-7vvqtp5!@!46n&%*yp89=$%6ma^zvhk8isxde11hqv_u=5$$^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "10.0.0.5" ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'potlucks.apps.PotlucksConfig',
+    'recipes.apps.RecipesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [
