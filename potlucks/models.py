@@ -31,9 +31,10 @@ class Assignment(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
 class Guest_Instance(models.Model):
-    guest = models.ForeignKey(User, on_delete=models.CASCADE)
+    guest = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    email = models.CharField(max_length=30, default="")
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    rsvp_status = models.BooleanField
+    rsvp_status = models.BooleanField(default=False)
     assignment = models.ForeignKey(Assignment, on_delete=models.SET_NULL, null=True)
        
 class Ingredient(models.Model):

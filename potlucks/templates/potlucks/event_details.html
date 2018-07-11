@@ -1,5 +1,29 @@
 {% include "potlucks/navbar.html" %}
 {% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/table-list.css' %}">
 <div class="main">
-<h1>This is the index</h1>
+<h1>Manage {{ event.name }}</h1>
+
+<div class="table-list" id="dish_table" style="float: left; width: 50%;">
+<h2>This is the dish assignment list</h2>
+</div>
+
+<div class="table-list" id="guest_table" style="float: left; width: 50%;">
+<h2>This is the guest list</h2>
+<table>
+{% for guest in event.guest_instance_set.all %}
+    <tr>
+    <td>{% if guest.guest %}{{ guest.guest.username }}{% else %}{{ guest.email }}{% endif %}</td>
+    <td>{% if guest.rsvp_status is True %} Yes {% else %} No {% endif %}</td>
+    </tr>
+{% endfor %}
+</table>
+<form action="{% url 'potlucks:event_add_guests' %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="id" value="{{ event.pk }}" />
+    <input type="submit" value="Add Guests" />
+</form>
+</div>
+
 </div>

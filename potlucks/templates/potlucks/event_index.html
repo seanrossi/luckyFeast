@@ -11,7 +11,7 @@
 <table>
 <tr><th>Event Name</th><th>Event Start</th><th>Event End</th></tr>
 {% for event in event_list %}
-    <tr><td><a href="{% url 'potlucks:event_dishes' %}?id={{ event.pk }}">{{ event.name }}</a></td>
+    <tr><td><a href="{% url 'potlucks:event_details' %}?id={{ event.pk }}">{{ event.name }}</a></td>
         <td>{{ event.start_time }}</td>
         <td>{{ event.end_time }}</td></tr>
 {% endfor %}
@@ -23,10 +23,10 @@
 <h2>Events that I am invited to:</h2>
 <table>
 <tr><th>Event Name</th><th>Event Start</th><th>Event End</th></tr>
-{% for event in event_list %}
-    <tr><td><a href="{% url 'potlucks:event_dishes' %}?id={{ event.pk }}">{{ event.name }}</a></td>
-        <td>{{ event.start_time }}</td>
-        <td>{{ event.end_time }}</td></tr>
+{% for instance in invited_list %}
+    <tr><td>{{ instance.event.name }}</a></td>
+        <td>{{ instance.event.start_time }}</td>
+        <td>{{ instance.event.end_time }}</td></tr>
 {% endfor %}
 </table>
 </div>

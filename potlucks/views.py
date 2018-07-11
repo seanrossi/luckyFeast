@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Event, Dish_Type_Main
+from .models import Event, Dish_Type_Main, Guest_Instance
 import datetime
 
 def index(request):
@@ -40,6 +40,12 @@ def user_enter(request):
 
     user = User.objects.create_user(username, email, password)
     login(request, user)
+    
+    #Resolve any guest_instances for matching email
+    instance_list = Guest_Instance.objects.filter(email=email)
+    for instance in instance_list:
+        instance.guest = user
+        instance.save()
     return render(request, 'potlucks/event_index.html')
 
 def user_profile(request):
@@ -63,7 +69,11 @@ def create_event(request):
     return render(request, 'potlucks/create_event.html', context)
 
 def event_details(request):
-    return render(request, 'potlucks/event_details.html')
+    user = request.user
+    event_id = request.GET['id']
+    event = Event.objects.get(pk=event_id)
+    context = {'event': event}
+    return render(request, 'potlucks/event_details.html', context)
 
 def event_enter(request):
     user = request.user
@@ -107,4 +117,25 @@ def event_dishes(request):
     dish_types = Dish_Type_Main.objects.all()
     context = {'event': event, 'dish_types':dish_types}
     return render(request, 'potlucks/event_dishes.html', context)
+
+def event_add_guests(request):
+    user = request.user
+    event_id = request.POST['id']
+    event = Event.objects.get(pk=event_id)
+    context = {'event': event}
+    return render(request, 'potlucks/event_add_guests.html', context)
+
+def event_enter_guest(request):
+    event_id = request.POST['id']
+    event = Event.objects.get(pk=event_id)
+    guest_email = request.POST['email']
+    g_instance = event.guest_instance_set.create(email=guest_email, rsvp_status=False)
+    guest_user = User.objects.filter(email=guest_email)
+    if guest_user.exists():
+        guest_user = User.objects.get(email=guest_email)
+        g_instance.guest=guest_user
+        g_instance.save()
+    context = {'event': event}
+    return render(request, 'potlucks/event_details.html', context)
+
 # Create your views here.
