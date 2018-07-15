@@ -28,6 +28,7 @@ class Assignment(models.Model):
     dish_id = models.AutoField
     dish_id = primary_key=True
     dish_type = models.CharField(max_length=20, default="")
+    assignment_status = models.BooleanField(default=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
 class Guest_Instance(models.Model):

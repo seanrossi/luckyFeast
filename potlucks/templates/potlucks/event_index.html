@@ -6,19 +6,24 @@
 <div class="main">
 <h1>My Events</h1>
 
+<!--Make table for hosted events-->
 <div class="table-list" id="hosted_table" style="float: left; width: 50%;">
 <h2>Events that I am hosting:</h2>
 <table>
 <tr><th>Event Name</th><th>Event Start</th><th>Event End</th></tr>
 {% for event in event_list %}
-    <tr><td><a href="{% url 'potlucks:event_details' %}?id={{ event.pk }}">{{ event.name }}</a></td>
+    <tr><td>{{ event.name }}</a></td>
         <td>{{ event.start_time }}</td>
-        <td>{{ event.end_time }}</td></tr>
+        <td>{{ event.end_time }}</td>
+        <td><form action="{% url 'potlucks:event_details' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="event_id" value="{{ event.pk }}" />
+            <input type="submit" value="Event Details" /></form></td></tr>
 {% endfor %}
 </table>
 </div>
 
-<!--Make second table for invited event, start hidden from view-->
+<!--Make second table for invited events-->
 <div class="table-list" id="invited-table" style="float: left; top: 30px; width: 50%; ">
 <h2>Events that I am invited to:</h2>
 <table>
@@ -26,7 +31,11 @@
 {% for instance in invited_list %}
     <tr><td>{{ instance.event.name }}</a></td>
         <td>{{ instance.event.start_time }}</td>
-        <td>{{ instance.event.end_time }}</td></tr>
+        <td>{{ instance.event.end_time }}</td>
+        <td><form action="{% url 'potlucks:event_details' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="event_id" value="{{ instance.event.pk }}" />
+            <input type="submit" value="Event Details" /></form></td></tr>
 {% endfor %}
 </table>
 </div>

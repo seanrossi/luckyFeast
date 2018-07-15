@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 from .models import Event, Dish_Type_Main, Guest_Instance
 import datetime
 
@@ -70,7 +71,7 @@ def create_event(request):
 
 def event_details(request):
     user = request.user
-    event_id = request.GET['id']
+    event_id = request.POST['event_id']
     event = Event.objects.get(pk=event_id)
     context = {'event': event}
     return render(request, 'potlucks/event_details.html', context)
@@ -112,7 +113,7 @@ def event_enter(request):
 
 def event_dishes(request):
     user = request.user
-    event_id = request.GET['id']
+    event_id = request.POST['event_id']
     event = Event.objects.get(pk=event_id)
     dish_types = Dish_Type_Main.objects.all()
     context = {'event': event, 'dish_types':dish_types}
@@ -120,10 +121,43 @@ def event_dishes(request):
 
 def event_add_guests(request):
     user = request.user
-    event_id = request.POST['id']
+    event_id = request.POST['event_id']
     event = Event.objects.get(pk=event_id)
     context = {'event': event}
     return render(request, 'potlucks/event_add_guests.html', context)
+
+def event_add_dish(request):
+    user = request.user
+    event_id = request.POST['event_id']
+    dish_added = request.POST['dish_main']
+    event = Event.objects.get(pk=event_id)
+    event.assignment_set.create(dish_type=dish_added)
+    context = {'event': event}
+    return render( request, 'potlucks/event_details.html', context);
+
+def event_remove_dish(request):
+    user = request.user
+    event_id = request.POST['event_id']
+    dish_removed = request.POST['dish_id']
+    event = Event.objects.get(pk=event_id)
+    dish = event.assignment_set.get(id=dish_removed)
+    dish.delete()
+    context = {'event': event}
+    return render( request, 'potlucks/event_details.html', context);
+
+def event_assign_dish(request):
+    user = request.user
+    event_id = request.POST['event_id']
+    dish_assigned = request.POST['dish_id']
+    event = Event.objects.get(pk=event_id)
+    dish = event.assignment_set.get(id=dish_assigned)
+    dish.assignment_status=True
+    dish.save()
+    guest_instance=event.guest_instance_set.get(guest=user)
+    guest_instance.assignment=dish
+    guest_instance.save()
+    context = {'event': event}
+    return render( request, 'potlucks/event_details.html', context);
 
 def event_enter_guest(request):
     event_id = request.POST['id']
@@ -135,6 +169,12 @@ def event_enter_guest(request):
         guest_user = User.objects.get(email=guest_email)
         g_instance.guest=guest_user
         g_instance.save()
+    send_mail(
+        request.user.username + 'invited you to an event!',
+        'You have been invited to ' + event.name,
+        'srossi455@gmail.com',
+        [guest_email]
+    )
     context = {'event': event}
     return render(request, 'potlucks/event_details.html', context)
 

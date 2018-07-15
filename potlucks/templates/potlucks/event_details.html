@@ -5,10 +5,43 @@
 <div class="main">
 <h1>Manage {{ event.name }}</h1>
 
+<!--TABLE DISPLAY FOR DISH ASSIGNMENT LIST-->
 <div class="table-list" id="dish_table" style="float: left; width: 50%;">
 <h2>This is the dish assignment list</h2>
+<table>
+{% for dish in event.assignment_set.all %}
+    <tr>
+    <td>{{ dish.dish_type }}</td>
+    <td>{{ dish.assignment_status }}</td>
+    <td>
+        <form action="{% url 'potlucks:event_assign_dish' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="event_id" value="{{ event.pk }}" />
+        <input type="hidden" name="dish_id" value="{{ dish.pk }}" />
+        <td><input type="submit" value="Accept Dish" /></td>
+        </form>
+    </td>
+    {% if event.host == request.user %} 
+        <form action="{% url 'potlucks:event_remove_dish' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="event_id" value="{{ event.pk }}" />
+        <input type="hidden" name="dish_id" value="{{ dish.pk }}" />
+        <td><input type="submit" value="Remove Dish" /></td>
+        </form>
+    {% endif %}
+    <tr>
+{% endfor %}
+</table>
+{% if event.host == request.user %} 
+    <form action="{% url 'potlucks:event_dishes' %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="event_id" value="{{ event.pk }}" />
+    <input type="submit" value="Add Dish" />
+{% endif %}
+</form>
 </div>
 
+<!--TABLE DISPLAY FOR GUEST LIST-->
 <div class="table-list" id="guest_table" style="float: left; width: 50%;">
 <h2>This is the guest list</h2>
 <table>
@@ -19,11 +52,13 @@
     </tr>
 {% endfor %}
 </table>
-<form action="{% url 'potlucks:event_add_guests' %}" method="POST">
+{% if event.host == request.user %} 
+    <form action="{% url 'potlucks:event_add_guests' %}" method="POST">
     {% csrf_token %}
-    <input type="hidden" name="id" value="{{ event.pk }}" />
+    <input type="hidden" name="event_id" value="{{ event.pk }}" />
     <input type="submit" value="Add Guests" />
-</form>
+    </form>
+{% endif %}
 </div>
 
 </div>

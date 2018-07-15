@@ -4,14 +4,26 @@
 <h1>Add Dishes to {{ event.name }}</h1>
 <h2>Current Dishes:</h2>
 <h2>Add New Dish:</h2>
-<ul>
+<form action="{% url 'potlucks:event_add_dish' %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="event_id" value="{{ event.pk }}"/>
+    <select name="dish_main" id="dish_main_choice" onchange="updateSubTypes()"/>
     {% for type in dish_types %}
-    <li>{{ type.main_type }}</li>
-    <select name="dish_type">
-    {% for sub in type.dish_type_sub_set.all %}
-    <option value="{{ sub.sub_type }}">{{ sub.sub_type }}</option>
+    <option value={{ type.main_type }}> {{ type.main_type }}: Any</option>
+    {% for sub_type in type.dish_type_sub_set.all %}
+    <option value={{ type.main_type }}:{{ sub_type.sub_type }}>{{ type.main_type }}:{{ sub_type.sub_type }}</option>
+    {% endfor %}
     {% endfor %}
     </select>
-    {% endfor %}
-</ul>
+    <input type="submit" value="Add Dish"/>
+</form>
+
+<script>
+function updateSubTypes(){
+    var dish_type = document.getElementById("dish_main_choice").value;
+    var sub_type = document.getElementById("p_{{ dish_type }}");
+    sub_type.style.display = "block";
+}
+</script>
 </html>
+

@@ -17,5 +17,8 @@ urlpatterns = [
     path('event_dishes', views.event_dishes, name='event_dishes'),
     path('event_enter', views.event_enter, name='event_enter'),
     path('event_add_guests', views.event_add_guests, name='event_add_guests'),
+    path('event_add_dish', views.event_add_dish, name='event_add_dish'),
+    path('event_remove_dish', views.event_remove_dish, name='event_remove_dish'),
+    path('event_assign_dish', views.event_assign_dish, name='event_assign_dish'),
     path('event_enter_guest', views.event_enter_guest, name='event_enter_guest'),
 ]
