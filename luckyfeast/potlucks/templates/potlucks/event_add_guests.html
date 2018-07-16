@@ -1,0 +1,22 @@
+{% load static %}
+{% include "potlucks/navbar.html" %}
+<html>
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/forms.css' %}">
+<h1>Invite guests to {{ event.name }}</h1>
+<div class="forms">
+<form action="{% url 'potlucks:event_enter_guest' %}" method="POST">
+{% csrf_token %}
+<input type="hidden" name="id" value="{{ event.pk }}" />
+<ul>
+    <li><b>Email:
+    <div class="forms-help-key">?</b>
+    <div class="forms-help">Enter the email address of the guest you would like to invite</div></div><br>
+    <input type="text" name="email" />
+    </li>
+    <li>
+    <input type="submit" value="Invite Guest" />
+    </li>
+</ul>
+</div>
+</html>

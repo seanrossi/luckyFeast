@@ -1,0 +1,68 @@
+.navbar {
+    overflow: hidden;
+    background-color: grey;
+    position: top;
+    width: 100%;
+}
+
+.navbar_left ul {
+    float: left;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.navbar_left li {
+    float: left;
+    text-size: 40;
+    display: block;
+}
+
+.navbar_left li a {
+    padding: 8px 20px;
+    text-size: 40;
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+}
+
+.navbar_left li a:hover {
+    background-color: black;
+}
+
+.navbar_right ul {
+    float: right;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+    padding-right: 10px;
+}
+
+.navbar_right li {
+    float: right;
+    text-size: 40;
+    display: block;
+}
+
+
+.navbar_right li a {
+    padding: 8px 20px;
+    text-size: 40;
+    float: right;
+    display: block;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+}
+
+.navbar_right li a:hover {
+    background-color: black;
+}
