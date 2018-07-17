@@ -11,3 +11,8 @@ python_version = "3.5"
 [packages]
 gunicorn = "*"
 django-heroku = "*"
+django = "*"
+pyyaml = "*"
+ua-parser = "*"
+user-agents = "*"
+django-user-agents = "*"
