@@ -10,14 +10,16 @@ import datetime
 def index(request):
     if request.user_agent.is_mobile:
         browser_string = "This is a mobile browser"
+        request.session['browser'] = 'mobile'
     else:
         browser_string = "This is a desktop browser"
+        request.session['browser'] = 'desktop'
     context = {'browser': browser_string}
     return render(request, 'potlucks/index.html', context)
 
 def user_login(request):
     request.session['target_view'] = 'potlucks:event_index'
-    return render(request, 'potlucks/user_login.html')
+    return render(request, 'potlucks/' + request.session['browser'] + '/user_login.html')
 
 def user_logout(request):
     logout(request)

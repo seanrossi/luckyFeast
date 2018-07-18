@@ -1,0 +1,26 @@
+<html>
+{% load static %}
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/mobile.css' %}">
+<div class="mobile-bar">
+    <button class="mobile-bar-item">&#8801;</button>
+    <div class="mobile-bar-item">Login</div>
+</div>
+<!--Check for error message and display-->
+{% if error_message %}
+<p><strong>{{ error_message }}</strong></p>
+{% endif %}
+
+<div class="mobile">
+<form action='{% url "potlucks:user_auth" %}' method='post'>
+{% csrf_token %}
+<ul>
+    <li><b>Username:</b><br>
+    <input type="text" name="username" /></li>
+    <li><b>Password:</b><br>
+    <input type="password" name="password" /></li>
+    <li><input type="submit" value="Login" /></li>
+</ul>
+</form>
+</div>
+</html>
