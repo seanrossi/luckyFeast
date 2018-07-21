@@ -10,128 +10,78 @@
 {% csrf_token %}
 
 <ul>
-    <li><b>Event Name:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter the name for your event</div></div><br>
-    <input type="text" name="event_name" /></li>
+    <li><b>Event Name:</b><br>
+    <input type="text" name="event_name" required/></li>
 
-    <li><b>Start Time:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter the start date and time of your event</div></div><br>
-    
-    <select name="startMonth">
-        <option value='1'>January</option>
-        <option value='2'>February</option>
-        <option value='3'>March</option>
-        <option value='4'>April</option>
-        <option value='5'>May</option>
-        <option value='6'>June</option>
-        <option value='7'>July</option>
-        <option value='8'>August</option>
-        <option value='9'>September</option>
-        <option value='10'>October</option>
-        <option value='11'>November</option>
-        <option value='12'>December</option>
-    </select>
+    <li><b>Event Key:</b>(Optional)<br>
+    <input type="text" name="event_key" pattern="[a-zA-Z0-9]+" /></li>
 
-    <select name="startDate">
-        {% for d in days %}
-        <option value="{{ d }}">{{ d }}</option>
-        {% endfor %}
-    </select>
-    <select name="startYear">
-        <option value="2018">2018</option>
-        <option value="2019">2019</option>
-        <option value="2020">2020</option>
-        <option value="2021">2021</option>
-    </select>
+    <li><b>Start Date:</b><br>
+    <input type="text" name="start_date"  id="startDate" required />
     <select name="startHour">
-        {% for h in hours %}
-        <option value="{{ h }}">{{ h }}:</option>
-        {% endfor %}
+      {% for h in hours %}
+        <option value="{{ h }}">{{ h }}</option>
+      {% endfor %}
     </select>
-    <select name="startMinutes">
-        <option value="00">00</option>
-        <option value="15">15</option>
-        <option value="30">30</option>
-        <option value="45">45</option>
+    <select name="startMinute">
+        <option value="0">:00</option>
+        <option value="15">:15</option>
+        <option value="30">:30</option>
+        <option value="45">:45</option>
     </select>
     <select name="startAm">
-        <option value="am">AM</option>
-        <option value="pm">PM</option>
-    </select></li>
-
-    <li><b>End Time:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter the end date and time</div></div><br>
-    <select name="endMonth">
-        <option value='1'>January</option>
-        <option value='2'>February</option>
-        <option value='3'>March</option>
-        <option value='4'>April</option>
-        <option value='5'>May</option>
-        <option value='6'>June</option>
-        <option value='7'>July</option>
-        <option value='8'>August</option>
-        <option value='9'>September</option>
-        <option value='10'>October</option>
-        <option value='11'>November</option>
-        <option value='12'>December</option>
+      <option value="am">AM</option>
+      <option value="pm">PM</option>
     </select>
+    </li>
     
-    <select name="endDate">
-        {% for d in days %}
-        <option value="{{ d }}">{{ d }}</option>
-        {% endfor %}
-    </select>
-    <select name="endYear">
-        <option value="2018">2018</option>
-        <option value="2019">2019</option>
-        <option value="2020">2020</option>
-        <option value="2021">2021</option>
-    </select>
+    <li><b>End Date:</b><br>
+    <input type="text" name="end_date"  id="endDate" required />
     <select name="endHour">
-        {% for h in hours %}
-        <option value="{{ h }}">{{ h }}:</option>
-        {% endfor %}
+      {% for h in hours %}
+        <option value="{{ h }}">{{ h }}</option>
+      {% endfor %}
     </select>
-    <select name="endMinutes">
-        <option value="00">00</option>
-        <option value="15">15</option>
-        <option value="30">30</option>
-        <option value="45">45</option>
+    <select name="endMinute">
+        <option value="0">:00</option>
+        <option value="15">:15</option>
+        <option value="30">:30</option>
+        <option value="45">:45</option>
     </select>
     <select name="endAm">
-        <option value="am">AM</option>
-        <option value="pm">PM</option>
-    </select></li>
+      <option value="am">AM</option>
+      <option value="pm">PM</option>
+    </select>
+    </li>
 
-    <li><b>Address:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter the name for your event</div></div><br>
-    <input type="text" name="address" /></li>
+    <li><b>Address:</b><br>
+    <input type="text" name="address" title="Numerical address and street" pattern="[0-9]+[A-Za-z0-9\s]+" required /></li>
 
-    <li><b>Apt:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter the name for your event</div></div><br>
+    <li><b>Apt:</b><br>
     <input type="text" name="apt" /></li>
 
-    <li><b>City:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter the name for your event</div></div><br>
-    <input type="text" name="city" /></li>
+    <li><b>City:</b><br>
+    <input type="text" name="city" title="Letters only" pattern="[A-Za-z\s]+" required /></li>
 
-    <li><b>State:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter the name for your event</div></div><br>
-    <input type="text" name="state" /></li>
+    <li><b>State:</b><br>
+    <input type="text" name="state" title="2 character state code" pattern="[A-Za-z]{2}" required /></li>
 
-    <li><b>Zipcode:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter the name for your event</div></div><br>
-    <input type="text" name="zipcode" /></li>
+    <li><b>Zipcode:</b><br>
+    <input type="text" name="zipcode" title="5 digit zipcode" pattern="[0-9]{5}" required /></li>
 
     <input type="submit" value="Create Event" />
+</ul>
 </form>
 </div>
 </div>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+$(document).ready(function()
+{
+    $("#startDate").datepicker();
+    $("#endDate").datepicker();
+});
+</script>

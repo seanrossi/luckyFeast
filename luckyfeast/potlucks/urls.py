@@ -1,4 +1,5 @@
 from django.urls import path
+from django.conf.urls import url
 from . import views
 
 app_name = 'potlucks'
@@ -21,4 +22,8 @@ urlpatterns = [
     path('event_remove_dish', views.event_remove_dish, name='event_remove_dish'),
     path('event_assign_dish', views.event_assign_dish, name='event_assign_dish'),
     path('event_enter_guest', views.event_enter_guest, name='event_enter_guest'),
+    path('event_cancel', views.event_cancel, name='event_cancel'),
+    path('event_find', views.event_find, name='event_find'),
+    path('key/', views.event_from_key, name='event_from_key'),
+    url(r'^ajax/validate_username/$', views.validate_username, name='validate_username'),
 ]

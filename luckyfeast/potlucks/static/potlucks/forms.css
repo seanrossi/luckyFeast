@@ -21,21 +21,17 @@
     list-style-type: none;
 }
 
-.forms-help-key {
-    position: relative;
-    display: inline-block;
-    float: right;
+
+.forms-input {
+    display: inline;
 }
 
 .forms-help {
-    position: absolute;
-    margin-left: 15px;
-    top: 0px;
-    padding-left: 10px;
+    position: relative;
     display: none; 
-    color: white;
-    background-color: grey;  
-    z-index: 1;
+    float: right;
+    margin-top: 5px;
+    margin-left: 10px;
 }
 
 .forms-help-key:hover .forms-help {display: block;}

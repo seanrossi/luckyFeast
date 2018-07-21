@@ -10,10 +10,11 @@
 {% csrf_token %}
 
 <ul>
-    <li><b>Event Name:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter the name for your event</div></div><br>
-    <input type="text" name="event_name" /></li>
+    <li><b>Event Name:</b><br>
+    <input type="text" name="event_name" required /></li>
+
+    <li><b>Event Public Key:</b>(Optional)<br>
+    <input type="text" name="event_key" pattern="[a-zA-Z0-9]" title="Letters and numbers only"/></li>
 
     <li><b>Start Time:
     <div class="forms-help-key">?</b>

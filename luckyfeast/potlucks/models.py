@@ -5,6 +5,7 @@ from django.utils import timezone
 class Event(models.Model):
     event_id = models.AutoField
     event_id.primary_key=True
+    event_key = models.CharField(max_length=10, null=True)
     name = models.CharField(max_length=40, default="")
     host = models.ForeignKey(User, on_delete=models.CASCADE)
     start_time = models.DateTimeField(default=timezone.now)

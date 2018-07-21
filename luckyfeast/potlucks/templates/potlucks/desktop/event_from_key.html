@@ -1,0 +1,25 @@
+{% include "potlucks/navbar.html" %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/forms.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
+<div class="main">
+<h1>Please enter event credentials</h1>
+
+<!--Check for error message and display-->
+{% if error_message %}
+<p><strong>{{ error_message }}</strong></p>
+{% endif %}
+
+<div class="forms">
+<form action='{% url "potlucks:event_find" %}' method='post'>
+{% csrf_token %}
+<ul>
+    <li><b>Event Key:</b><br>
+    <input type="text" name="event_key" /></li>
+    <li><b>First Name of Host:</b><br>
+    <input type="text" name="host_name" /></li>
+    <li><input type="submit" value="Login" /></li>
+</ul>
+</form>
+</div>
+</div>

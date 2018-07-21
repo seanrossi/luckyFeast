@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -23,6 +23,12 @@ def user_login(request):
 
 def user_logout(request):
     logout(request)
+    if request.user_agent.is_mobile:
+        browser_string = "This is a mobile browser"
+        request.session['browser'] = 'mobile'
+    else:
+        browser_string = "This is a desktop browser"
+        request.session['browser'] = 'desktop'
     return render(request, 'potlucks/index.html')
 
 def user_auth(request):
@@ -34,12 +40,20 @@ def user_auth(request):
         return HttpResponseRedirect(reverse(request.session['target_view']))
     else:
         context = {'error_message': "User and/or password not found"}
-        return render(request, 'potlucks/user_login.html', context)
+        return render(request, 'potlucks/' + request.session['browser'] + '/user_login.html', context)
 
 def user_register(request):
-    userList = User.objects.all()
-    context = {'userList': userList}
-    return render(request, 'potlucks/user_register.html', context)
+    user_list = User.objects.all()
+    browser_string = request.session['browser']
+    context = {'user_list': user_list, 'browser': browser_string}
+    return render(request, 'potlucks/' + browser_string + '/user_register.html', context)
+
+def validate_username(request):
+    user_name = request.GET.get('username', None)
+    data = {
+        'in_use': User.objects.filter(username__iexact=user_name).exists()
+    }
+    return JsonResponse(data)
 
 def user_enter(request):
     username = request.POST['username']
@@ -47,6 +61,12 @@ def user_enter(request):
     email = request.POST['email']
 
     user = User.objects.create_user(username, email, password)
+    if request.POST['firstname'] != "":
+        user.first_name = request.POST['firstname']
+        user.save()
+    if request.POST['lastname'] != "":
+        user.last_name = request.POST['lastname']
+        user.save()
     login(request, user)
     
     #Resolve any guest_instances for matching email
@@ -54,7 +74,7 @@ def user_enter(request):
     for instance in instance_list:
         instance.guest = user
         instance.save()
-    return render(request, 'potlucks/event_index.html')
+    return render(request, 'potlucks/' + request.session['browser'] + '/event_index.html')
 
 def user_profile(request):
     return render(request, 'potlucks/user_profile.html')
@@ -62,50 +82,54 @@ def user_profile(request):
 def event_index(request):
     if not request.user.is_authenticated:
         request.session['target_view'] = 'potlucks:event_index'
-        return render(request, 'potlucks/user_login.html')
+        return render(request, 'potlucks/' + request.session['browser'] + '/user_login.html')
     user = request.user
     event_list = user.event_set.all()
     invited_list = user.guest_instance_set.all()
     context = {'event_list': event_list, 'invited_list': invited_list}
-    return render(request, 'potlucks/event_index.html', context)
+    return render(request, 'potlucks/' + request.session['browser'] + '/event_index.html', context)
 
 def create_event(request):
     if not request.user.is_authenticated:
         request.session['target_view'] = 'potlucks:create_event'
         return render(request, 'potlucks/user_login.html')
     context = {'days':range(1, 32), 'hours':range(12), 'minutes':range(60)}
-    return render(request, 'potlucks/create_event.html', context)
+    return render(request, 'potlucks/' + request.session['browser'] + '/create_event.html', context)
 
 def event_details(request):
     user = request.user
     event_id = request.POST['event_id']
     event = Event.objects.get(pk=event_id)
-    context = {'event': event}
-    return render(request, 'potlucks/event_details.html', context)
+    user_dishes = Dish_Type_Main.objects.all()
+    if event.host != user:
+      guest_instance = Guest_Instance.objects.get(event=event, guest=user)
+      context = {'event': event, 'guest_instance': guest_instance}
+    else:
+        context = {'event': event}
+    return render(request, 'potlucks/' + request.session['browser'] + '/event_details.html', context)
 
+#VIEW TO RENDER AFTER USER SUBMITS EVENT PARAMETERS
 def event_enter(request):
     user = request.user
     event_name = request.POST['event_name']
-    
-    startMonth = request.POST['startMonth']
-    startDate = request.POST['startDate']
-    startYear = request.POST['startYear']
+    startDate = request.POST['start_date']
     startHour = int(request.POST['startHour'])
-    startMinutes = request.POST['startMinutes']
+    startMinute = int(request.POST['startMinute'])
     startAm = request.POST['startAm']
     if startAm == "pm":
         startHour += 12
-    start = datetime.datetime(int(startYear), int(startMonth), int(startDate), int(startHour), int(startMinutes))    
+    formatString = '%m/%d/%Y'
+    start = datetime.datetime.strptime(startDate, formatString)
+    start = start.replace(hour=startHour, minute=startMinute)    
 
-    endMonth = request.POST['endMonth']
-    endDate = request.POST['endDate']
-    endYear = request.POST['endYear']
+    endDate = request.POST['end_date']
     endHour = int(request.POST['endHour'])
-    endMinutes = request.POST['endMinutes']
+    endMinute = int(request.POST['endMinute'])
     endAm = request.POST['endAm']
     if endAm == "pm":
         endHour += 12
-    end = datetime.datetime(int(endYear), int(endMonth), int(endDate), int(endHour), int(endMinutes))    
+    end = datetime.datetime.strptime(startDate, formatString)
+    end = end.replace(hour=endHour, minute=endMinute)    
 
     address = request.POST['address']
     apt = request.POST['apt']
@@ -114,9 +138,35 @@ def event_enter(request):
     zipcode = request.POST['zipcode']
 
     event = user.event_set.create(name=event_name, host=request.user, start_time=start, end_time=end, address=address, apt=apt, city=city, state=state, zipcode=zipcode)
+    if request.POST['event_key'] != "":
+        event.event_key = request.POST['event_key']
+        event.save()
     dish_types = Dish_Type_Main.objects.all()
     context = {'event': event}
-    return render(request, 'potlucks/event_details.html', context)
+    return render(request, 'potlucks/' + request.session['browser'] + '/event_details.html', context)
+
+def event_cancel(request):
+    event_id = request.POST['event_id']
+    Event.objects.get(pk=event_id).delete()
+    user = request.user
+    event_list = user.event_set.all()
+    invited_list = user.guest_instance_set.all()
+    context = {'event_list': event_list, 'invited_list': invited_list}
+    return render(request, 'potlucks/' + request.session['browser'] + '/event_index.html', context)
+
+def event_from_key(request):
+    return render(request, 'potlucks/desktop/event_from_key.html')
+
+def event_find(request):
+    if Event.objects.filter(event_key=request.POST['event_key']).exists():
+        event = Event.objects.get(event_key=request.POST['event_key'])
+        if event.host.first_name == request.POST['host_name']:
+            return render(request, 'potlucks/event_details.html', {'event': event})
+        else:
+            context = {'error_message': 'Incorrect host'}
+    else:
+        context = {'error_message': 'Incorrect event'}
+    return render(request, 'potlucks/desktop/event_from_key.html', context)
 
 def event_dishes(request):
     user = request.user
@@ -124,14 +174,14 @@ def event_dishes(request):
     event = Event.objects.get(pk=event_id)
     dish_types = Dish_Type_Main.objects.all()
     context = {'event': event, 'dish_types':dish_types}
-    return render(request, 'potlucks/event_dishes.html', context)
+    return render(request, 'potlucks/' + request.session['browser'] + '/event_dishes.html', context)
 
 def event_add_guests(request):
     user = request.user
     event_id = request.POST['event_id']
     event = Event.objects.get(pk=event_id)
     context = {'event': event}
-    return render(request, 'potlucks/event_add_guests.html', context)
+    return render(request, 'potlucks/' + request.session['browser'] + '/event_add_guests.html', context)
 
 def event_add_dish(request):
     user = request.user
@@ -140,7 +190,7 @@ def event_add_dish(request):
     event = Event.objects.get(pk=event_id)
     event.assignment_set.create(dish_type=dish_added)
     context = {'event': event}
-    return render( request, 'potlucks/event_details.html', context);
+    return render( request, 'potlucks/' + request.session['browser'] + '/event_details.html', context);
 
 def event_remove_dish(request):
     user = request.user
@@ -150,7 +200,7 @@ def event_remove_dish(request):
     dish = event.assignment_set.get(id=dish_removed)
     dish.delete()
     context = {'event': event}
-    return render( request, 'potlucks/event_details.html', context);
+    return render( request, 'potlucks/' + request.session['browser'] + '/event_details.html', context);
 
 def event_assign_dish(request):
     user = request.user
@@ -164,7 +214,7 @@ def event_assign_dish(request):
     guest_instance.assignment=dish
     guest_instance.save()
     context = {'event': event}
-    return render( request, 'potlucks/event_details.html', context);
+    return render( request, 'potlucks/' + request.session['browser'] + '/event_details.html', context);
 
 def event_enter_guest(request):
     event_id = request.POST['id']
@@ -183,6 +233,6 @@ def event_enter_guest(request):
     #    [guest_email]
     #)
     context = {'event': event}
-    return render(request, 'potlucks/event_details.html', context)
+    return render(request, 'potlucks/' + request.session['browser'] + '/event_details.html', context)
 
 # Create your views here.

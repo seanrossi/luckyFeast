@@ -6,37 +6,113 @@
 <div class="main">
 <h1>This is the user registration page</h1>
 
+<!--Create unordered list of username to filter-->
+<!--This will be replaced with AJAX implementation-->
+<ul id="userUl" style="display:none;">
+    {% for u in user_list %}
+        <li class="userListItem"><a>{{ u }}</a></li>
+    {% endfor %}
+</ul>
+
+<!--Create forms for user creation-->
+<!--First and Last names are optional-->
 <div class="forms">
 <form action="{% url 'potlucks:user_enter' %}" method='POST'>
-{% csrf_token %}
-<ul>
-    <!--Each input has a title, a help hover key, and a helper message-->
-    <li><b>First Name:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter Username</div></div><br>
-    <input type="text" name="firstname" /></li>
+    {% csrf_token %}
+    <ul>
+        <!--Each input has a title, a help hover key, and a helper message-->
+        <li><b>First Name:</b><br>
+        <input type="text" name="firstname" /></li>
     
-    <li><b>Last Name:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter Username</div></div><br>
-    <input type="text" name="lastname" /></li>
+        <li><b>Last Name:</b><br>
+        <input type="text" name="lastname" /></li>
     
-    <li><b>Username:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Enter Username</div></div><br>
-    <input type="text" name="username" /></li>
+        <li><b>Username:</b><br>
+        <div class="forms-input">
+        <input type="text" name="username" id="userInput" pattern="[A-Za-z]+[A-Za-z0-9]" title="Letters and numbers only, must start with a letter and contain 6-12 characters" required/>
+        <p id="nameAvailable" class="forms-help">The username is long enough</p></div></li>
     
-    <li><b>Password:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Password must be at least 6 characters long and must contain 1 number</div></div><br>
-    <input type="password" name="password" /></li>
+        <li><b>Password:</b><br>
+        <input type="password" name="password" pattern="[A-Za-z]+[A-Za-z0-9](?=.*\d).{6,12}" title="Must start with a letter, contain at least one number and contain 6-12 characters" required/></li>
 
-    <li><b>Email:
-    <div class="forms-help-key">?</b>
-    <div class="forms-help">Email must be in form of name@email.com</div></div><br>
-    <input type="text" name="email" /></li>
+        <li><b>Email:</b><br>
+        <input type="text" name="email" required/></li>
     
-    <li><input type="submit" value="Register" /></li>
+        <li><input id="register_btn" type="submit" value="Register" /></li>
 </form>
 </div>
 </div>
+
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
+<script>
+$(document).ready(function()
+{
+  $("#userInput").keyup(function()
+  {
+    var uname = $("#userInput").val().trim();
+
+    if(uname.length >= 6)
+    {
+      $("#nameAvailable").show();
+            
+      $.ajax(
+      {
+        url: '/ajax/validate_username',
+        data: 
+        {
+          'username': uname
+        },
+        datatype: 'json',
+        success: function(data)
+        {
+          if(data.in_use)
+          {
+            $("#nameAvailable").html("<b>Username is already taken</b>").css("color", "red");       
+          }
+          else
+          {
+            $("#nameAvailable").html("<b>Username is available</b>").css("color", "green");       
+          }
+        }
+      });
+    }
+    else if(uname.length >= 1)
+    {
+      $("#nameAvailable").show();
+      $("#nameAvailable").html("<b>Username is too short</b>").css("color", "red");       
+    }
+  });
+});
+
+/*function userLookup()
+{
+    var ul = document.getElementById("userUl");
+    var li = document.getElementsByClassName("userListItem");
+    var input = document.getElementById("userInput");
+    var filter = input.value.toUpperCase();
+    var name_taken = false;
+    var name_available_p = document.getElementById("nameAvailable");
+    name_available_p.innerHTML = "This should update";
+    for( i = 0; i < li.length; i++ )
+    {
+        a = li[i].getElementsByTagName("a")[0];
+        if( a.innerHTML.toUpperCase().indexOf(filter) > -1 )
+        {
+            name_taken = true;
+        }
+    }
+
+    if( name_taken )
+    {
+        name_available_p.innerHTML = "Username is already taken";
+        name_available_p.style.color = "red";
+    }
+    else
+    {
+        name_available_p.innerHTML = "Username is available";
+        name_available_p.style.color = "green";
+    }
+}*/
+</script>
+
+</html>

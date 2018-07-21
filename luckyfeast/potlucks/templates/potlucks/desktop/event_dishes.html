@@ -9,9 +9,9 @@
     <input type="hidden" name="event_id" value="{{ event.pk }}"/>
     <select name="dish_main" id="dish_main_choice" onchange="updateSubTypes()"/>
     {% for type in dish_types %}
-    <option value={{ type.main_type }}> {{ type.main_type }}: Any</option>
+    <option value={{ type.main_type }}:Any> {{ type.main_type }}: Any</option>
     {% for sub_type in type.dish_type_sub_set.all %}
-    <option value={{ type.main_type }}:{{ sub_type.sub_type }}>{{ type.main_type }}:{{ sub_type.sub_type }}</option>
+    <option value={{ type.main_type }}:{{ sub_type.sub_type }}>{{ type.main_type }}: {{ sub_type.sub_type }}</option>
     {% endfor %}
     {% endfor %}
     </select>
