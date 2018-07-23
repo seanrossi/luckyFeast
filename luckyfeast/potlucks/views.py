@@ -19,7 +19,7 @@ def index(request):
 
 def user_login(request):
     request.session['target_view'] = 'potlucks:event_index'
-    return render(request, 'potlucks/' + request.session['browser'] + '/user_login.html')
+    return render(request, 'potlucks/desktop/user_login.html')
 
 def user_logout(request):
     logout(request)
@@ -40,14 +40,14 @@ def user_auth(request):
         return HttpResponseRedirect(reverse(request.session['target_view']))
     else:
         context = {'error_message': "User and/or password not found"}
-        return render(request, 'potlucks/' + request.session['browser'] + '/user_login.html', context)
+        return render(request, 'potlucks/desktop/user_login.html', context)
 
 def user_register(request):
     request.session['target_view'] = 'potlucks:event_index'
     user_list = User.objects.all()
     browser_string = request.session['browser']
     context = {'user_list': user_list, 'browser': browser_string}
-    return render(request, 'potlucks/' + browser_string + '/user_register.html', context)
+    return render(request, 'potlucks/desktop/user_register.html', context)
 
 def validate_username(request):
     user_name = request.GET.get('username', None)
@@ -83,19 +83,19 @@ def user_profile(request):
 def event_index(request):
     if not request.user.is_authenticated:
         request.session['target_view'] = 'potlucks:event_index'
-        return render(request, 'potlucks/' + request.session['browser'] + '/user_login.html')
+        return render(request, 'potlucks/desktop/user_login.html')
     user = request.user
     event_list = user.event_set.all()
     invited_list = user.guest_instance_set.all()
     context = {'event_list': event_list, 'invited_list': invited_list}
-    return render(request, 'potlucks/' + request.session['browser'] + '/event_index.html', context)
+    return render(request, 'potlucks/desktop/event_index.html', context)
 
 def create_event(request):
     if not request.user.is_authenticated:
         request.session['target_view'] = 'potlucks:create_event'
         return render(request, 'potlucks/user_login.html')
     context = {'days':range(1, 32), 'hours':range(12), 'minutes':range(60)}
-    return render(request, 'potlucks/' + request.session['browser'] + '/create_event.html', context)
+    return render(request, 'potlucks/desktop/create_event.html', context)
 
 def event_details(request):
     user = request.user
@@ -107,7 +107,7 @@ def event_details(request):
       context = {'event': event, 'guest_instance': guest_instance}
     else:
         context = {'event': event}
-    return render(request, 'potlucks/' + request.session['browser'] + '/event_details.html', context)
+    return render(request, 'potlucks/desktop/event_details.html', context)
 
 #VIEW TO RENDER AFTER USER SUBMITS EVENT PARAMETERS
 def event_enter(request):
@@ -144,7 +144,7 @@ def event_enter(request):
         event.save()
     dish_types = Dish_Type_Main.objects.all()
     context = {'event': event}
-    return render(request, 'potlucks/' + request.session['browser'] + '/event_details.html', context)
+    return render(request, 'potlucks/desktop/event_details.html', context)
 
 def event_cancel(request):
     event_id = request.POST['event_id']
@@ -247,14 +247,14 @@ def event_dishes(request):
     event = Event.objects.get(pk=event_id)
     dish_types = Dish_Type_Main.objects.all()
     context = {'event': event, 'dish_types':dish_types}
-    return render(request, 'potlucks/' + request.session['browser'] + '/event_dishes.html', context)
+    return render(request, 'potlucks/desktop/event_dishes.html', context)
 
 def event_add_guests(request):
     user = request.user
     event_id = request.POST['event_id']
     event = Event.objects.get(pk=event_id)
     context = {'event': event}
-    return render(request, 'potlucks/' + request.session['browser'] + '/event_add_guests.html', context)
+    return render(request, 'potlucks/desktop/event_add_guests.html', context)
 
 def event_add_dish(request):
     user = request.user
@@ -263,7 +263,7 @@ def event_add_dish(request):
     event = Event.objects.get(pk=event_id)
     event.assignment_set.create(dish_type=dish_added)
     context = {'event': event}
-    return render( request, 'potlucks/' + request.session['browser'] + '/event_details.html', context);
+    return render( request, 'potlucks/desktop/event_details.html', context);
 
 def event_remove_dish(request):
     user = request.user
@@ -273,7 +273,7 @@ def event_remove_dish(request):
     dish = event.assignment_set.get(id=dish_removed)
     dish.delete()
     context = {'event': event}
-    return render( request, 'potlucks/' + request.session['browser'] + '/event_details.html', context);
+    return render( request, 'potlucks/desktop/event_details.html', context);
 
 def event_assign_dish(request):
     user = request.user
@@ -287,7 +287,7 @@ def event_assign_dish(request):
     guest_instance.assignment=dish
     guest_instance.save()
     context = {'event': event}
-    return render( request, 'potlucks/' + request.session['browser'] + '/event_details.html', context);
+    return render( request, 'potlucks/desktop/event_details.html', context);
 
 def event_enter_guest(request):
     event_id = request.POST['id']
@@ -306,6 +306,6 @@ def event_enter_guest(request):
     #    [guest_email]
     #)
     context = {'event': event}
-    return render(request, 'potlucks/' + request.session['browser'] + '/event_details.html', context)
+    return render(request, 'potlucks/desktop/event_details.html', context)
 
 # Create your views here.

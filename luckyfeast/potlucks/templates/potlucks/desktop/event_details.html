@@ -4,6 +4,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/table-list.css' %}">
 <div class="main">
 <h1>{{ event.name }} Details</h1>
+{% if request.user != event.host %}
 <div class="table-list" >
 <table style="border: blue solid 2px;">
 <th>Going?</th>
@@ -18,6 +19,7 @@
 </tr>
 </table>
 </div>
+{% endif %}
 <br>
 {% if event.host == request.user %} 
     <form action="{% url 'potlucks:event_cancel' %}" method="POST">
@@ -87,8 +89,10 @@
     </tr>
 {% endfor %}
 </table>
+{% if request.user != event.host %}
 <input type="submit" value="Change RSVP/Dish" id="submitButton"/>
 </form>
+{% endif %}
 {% if event.host == request.user %} 
     <form action="{% url 'potlucks:event_dishes' %}" method="POST">
     {% csrf_token %}
