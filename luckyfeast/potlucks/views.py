@@ -16,7 +16,7 @@ def index(request):
         browser_string = "This is a desktop browser"
         request.session['browser'] = 'desktop'
     context = {'browser': browser_string}
-    return render(request, 'potlucks/index.html', context)
+    return render(request, 'potlucks/desktop/index.html', context)
 
 def user_login(request):
     request.session['target_view'] = 'potlucks:event_index'
