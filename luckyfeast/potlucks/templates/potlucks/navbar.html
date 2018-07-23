@@ -19,6 +19,7 @@
       <ul class="nav navbar-nav">
         <li><a href='{% url 'potlucks:event_index' %}'>My Events</a></li>
         <li><a href='{% url 'potlucks:create_event' %}'>Create Event</a></li>
+        <li><a href='{% url 'potlucks:event_from_key' %}'>Find Event</a></li>
         <li><a href=''>Recipes</a></li>
       </ul>   
       {% if request.user.is_authenticated %}
@@ -28,7 +29,7 @@
       </ul>
       {% else %}
       <ul class="nav navbar-nav navbar-right">
-        <li><a href='{% url 'potlucks:user_register' %}'><span class="glyphicon glyphicon-user">Sign Up</span></a></li>
+        <li><a href='{% url 'potlucks:user_register' %}'><span class="glyphicon glyphicon-user">SignUp</span></a></li>
         <li><a href='{% url 'potlucks:user_login' %}'><span class="glyphicon glyphicon-log-in">Login</span></a></li>
       </ul>
       {% endif %}

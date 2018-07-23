@@ -8,6 +8,7 @@ from .models import Event, Dish_Type_Main, Guest_Instance
 import datetime
 
 def index(request):
+    request.session['target_view'] = 'potlucks:event_index'
     if request.user_agent.is_mobile:
         browser_string = "This is a mobile browser"
         request.session['browser'] = 'mobile'
@@ -29,6 +30,7 @@ def user_logout(request):
     else:
         browser_string = "This is a desktop browser"
         request.session['browser'] = 'desktop'
+    request.session['target_view'] = 'potlucks:event_index'
     return render(request, 'potlucks/index.html')
 
 def user_auth(request):

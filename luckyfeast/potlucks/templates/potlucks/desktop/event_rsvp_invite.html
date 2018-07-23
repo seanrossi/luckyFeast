@@ -68,7 +68,11 @@
 <tr><th>Guest</th><th>Going?</th></tr>
 {% for guest in event.guest_instance_set.all %}
     <tr>
-    <td>{% if guest.guest %}{{ guest.guest.username }}{% else %}{{ guest.email }}{% endif %}</td>
+    <td>{% if guest.guest %}
+        {% if guest.guest.first_name != '' %}{{ guest.guest.first_name }}
+        {% else %}
+        {{ guest.guest.username }}{% endif %}
+        {% else %}{{ guest.email }}{% endif %}</td>
     <td>{{ guest.get_rsvp_status_display }}</td>
     </tr>
 {% endfor %}
