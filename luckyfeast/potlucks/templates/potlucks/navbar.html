@@ -1,26 +1,38 @@
-{% load static %}
 <html>
-<link rel="stylesheet" type="text/css" href="{% static 'potlucks/navbar.css' %}">
-<div class="navbar">
-<div class="navbar_left">
-<ul>
-    <li><b><a href='{% url 'potlucks:event_index' %}'>My Events</a></b></li>
-    <li><b><a href='{% url 'potlucks:create_event' %}'>Create Event</a></b></li>
-    <li><b><a href=''>Recipes</a></b></li>
-</ul>   
-</div>
-<div class="navbar_right">
-{% if request.user.is_authenticated %}
-<ul>
-    <li><b><a href='{% url 'potlucks:user_logout' %}'>Logout</a></b></li>
-    <li><b><a href='{% url 'potlucks:user_profile' %}'>{{ request.user.username }}</a></b></li>
-</ul>
-{% else %}
-<ul>
-    <li><b><a href='{% url 'potlucks:user_register' %}'>Register</a></b></li>
-    <li><b><a href='{% url 'potlucks:user_login' %}'>Login</a></b></li>
-</ul>
-{% endif %}
-</div>
-</div>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{% url 'potlucks:event_index' %}">Lucky Feast</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li><a href='{% url 'potlucks:event_index' %}'>My Events</a></li>
+        <li><a href='{% url 'potlucks:create_event' %}'>Create Event</a></li>
+        <li><a href=''>Recipes</a></li>
+      </ul>   
+      {% if request.user.is_authenticated %}
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href='{% url 'potlucks:user_logout' %}'>Logout</a></li>
+        <li><a href='{% url 'potlucks:user_profile' %}'>{{ request.user.username }}</a></li>
+      </ul>
+      {% else %}
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href='{% url 'potlucks:user_register' %}'><span class="glyphicon glyphicon-user">Sign Up</span></a></li>
+        <li><a href='{% url 'potlucks:user_login' %}'><span class="glyphicon glyphicon-log-in">Login</span></a></li>
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+</nav>
 </html>

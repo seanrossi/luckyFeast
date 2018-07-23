@@ -1,8 +1,11 @@
 {% include "potlucks/navbar.html" %}
 {% load static %}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/table-list.css' %}">
-<div class="main">
+<div class="container-fluid" style="padding-top: 70px">
 <h1>{{ event.name }} Details</h1>
 <form action="{% url 'potlucks:event_rsvp_action' %}" method="POST">
 {% csrf_token %}
@@ -12,31 +15,36 @@
 <br><br>
 
 <!--DISPLAY EVENT PARAMETERS HERE-->
-<div style="width: 100%; display:block;">
-  <div style="width: 15%; position:relative; float: left;">
-    <h3>Address</h3>
-    {{ event.address }}
-  </div>
-  <div style="width: 15%; position:relative; float:left;">
-    <h3>City</h3>
-    {{ event.city }}
-  </div>
-  <div style="width: 15%;position:relative; float: left;">
-    <h3>Zip</h3>
-    {{ event.zipcode }}
-  </div>
-  <div style="width: 25%;position:relative; float: left">
-    <h3>Start</h3>
-    {{ event.start_time }}
-  </div>
-  <div style="width: 30%;position:relative; float: left">
-    <h3>End</h3>
-    {{ event.end_time }}
-  </div>
+<div class="container">
+<div class="row">
+<div class="col-xs-4 col-sm-2">
+<h3>Address</h3>
+{{ event.address }}
+</div>
+<div class="col-xs-4 col-sm-2">
+<h3>City</h3>
+{{ event.city }}
+</div>
+<div class="col-xs-4 col-sm-2">
+<h3>Zip</h3>
+{{ event.zipcode }}
+</div>
+<div class="clearfix visible-xs"></div>
+<div class="col-xs-6 col-sm-3">
+<h3>Start</h3>
+{{ event.start_time }}
+</div>
+<div class="col-xs-6 col-sm-3">
+<h3>End</h3>
+{{ event.end_time }}
+</div>
+</div>
 </div>
 
 <!--TABLE DISPLAY FOR DISH ASSIGNMENT LIST-->
-<div class="table-list" id="dish_table" style="margin-top:20px; float: left; width: 50%;">
+<div class="row">
+<div class="col-sm-6">
+<div class="table-list" id="dish_table">
 <h2>Please choose a dish to bring</h2>
 <table>
 {% for dish in event.assignment_set.all %}
@@ -50,18 +58,23 @@
 <input type="submit" id="submitButton" value="Confirm RSVP" />
 </form>
 </div>
+</div>
 
 <!--TABLE DISPLAY FOR GUEST LIST-->
-<div class="table-list" id="guest_table" style="margin-top: 20px; float: left; width: 50%;">
+<div class="col-sm-6">
+<div class="table-list" id="guest_table">
 <h2>This is the guest list</h2>
 <table>
+<tr><th>Guest</th><th>Going?</th></tr>
 {% for guest in event.guest_instance_set.all %}
     <tr>
     <td>{% if guest.guest %}{{ guest.guest.username }}{% else %}{{ guest.email }}{% endif %}</td>
-    <td>{% if guest.rsvp_status is True %} Yes {% else %} No {% endif %}</td>
+    <td>{{ guest.get_rsvp_status_display }}</td>
     </tr>
 {% endfor %}
 </table>
+</div>
+</div>
 </div>
 </div>
 

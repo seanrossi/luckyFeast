@@ -43,7 +43,6 @@ def user_auth(request):
         return render(request, 'potlucks/desktop/user_login.html', context)
 
 def user_register(request):
-    request.session['target_view'] = 'potlucks:event_index'
     user_list = User.objects.all()
     browser_string = request.session['browser']
     context = {'user_list': user_list, 'browser': browser_string}
@@ -182,11 +181,11 @@ def event_rsvp_invite(request):
 
 def event_rsvp_action(request):
     if not request.user.is_authenticated:
+        request.session['event_id'] = request.POST.get('event_id', '')
+        request.session['target_view'] = 'potlucks:event_rsvp_action'
         request.session['rsvp'] = request.POST.get('rsvp', '')
         if request.session['rsvp'] == '2':
             request.session['dish_id'] = request.POST['dish_id']
-        request.session['event_id'] = request.POST.get('event_id', '')
-        request.session['target_view'] = 'potlucks:event_rsvp_action'
         context = {'error_message': "Please login before you continue"}
         return render(request, 'potlucks/desktop/user_login.html', context)
     

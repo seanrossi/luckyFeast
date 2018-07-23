@@ -1,6 +1,8 @@
 .navbar {
     overflow: hidden;
     background-color: grey;
+    position: top;
+    width: 100%;
 }
 
 .navbar_left ul {

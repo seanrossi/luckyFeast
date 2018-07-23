@@ -1,8 +1,17 @@
 {% load static %}
 {% include "potlucks/navbar.html" %}
 <html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<div class="container" style="padding-top: 70px">
 <h1>Add Dishes to {{ event.name }}</h1>
 <h2>Current Dishes:</h2>
+{% for dish in event.assignment_set.all %}
+<ul>
+  <li>{{ dish.dish_type }}</li>
+</ul>
+{% endfor %}
 <h2>Add New Dish:</h2>
 <form action="{% url 'potlucks:event_add_dish' %}" method="POST">
     {% csrf_token %}
@@ -17,7 +26,7 @@
     </select>
     <input type="submit" value="Add Dish"/>
 </form>
-
+</div>
 <script>
 function updateSubTypes(){
     var dish_type = document.getElementById("dish_main_choice").value;
