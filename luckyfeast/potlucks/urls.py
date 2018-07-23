@@ -24,6 +24,9 @@ urlpatterns = [
     path('event_enter_guest', views.event_enter_guest, name='event_enter_guest'),
     path('event_cancel', views.event_cancel, name='event_cancel'),
     path('event_find', views.event_find, name='event_find'),
+    path('event_rsvp_invite', views.event_rsvp_invite, name='event_rsvp_invite'),
+    path('event_rsvp_action', views.event_rsvp_action, name='event_rsvp_action'),
+    path('event_rsvp_change', views.event_rsvp_change, name='event_rsvp_change'),
     path('key/', views.event_from_key, name='event_from_key'),
     url(r'^ajax/validate_username/$', views.validate_username, name='validate_username'),
 ]

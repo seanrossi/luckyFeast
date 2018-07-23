@@ -43,6 +43,7 @@ def user_auth(request):
         return render(request, 'potlucks/' + request.session['browser'] + '/user_login.html', context)
 
 def user_register(request):
+    request.session['target_view'] = 'potlucks:event_index'
     user_list = User.objects.all()
     browser_string = request.session['browser']
     context = {'user_list': user_list, 'browser': browser_string}
@@ -74,7 +75,7 @@ def user_enter(request):
     for instance in instance_list:
         instance.guest = user
         instance.save()
-    return render(request, 'potlucks/' + request.session['browser'] + '/event_index.html')
+    return HttpResponseRedirect(reverse(request.session['target_view']))
 
 def user_profile(request):
     return render(request, 'potlucks/user_profile.html')
@@ -161,12 +162,84 @@ def event_find(request):
     if Event.objects.filter(event_key=request.POST['event_key']).exists():
         event = Event.objects.get(event_key=request.POST['event_key'])
         if event.host.first_name == request.POST['host_name']:
-            return render(request, 'potlucks/event_details.html', {'event': event})
+            return render(request, 'potlucks/desktop/event_rsvp_invite.html', {'event': event})
         else:
             context = {'error_message': 'Incorrect host'}
     else:
         context = {'error_message': 'Incorrect event'}
     return render(request, 'potlucks/desktop/event_from_key.html', context)
+
+def event_rsvp_invite(request):
+    event_id = request.POST['event_id']
+    request.session['event_id'] = event_id
+    if not request.user.is_authenticated:
+        request.session['target_view'] = 'potlucks:event_rsvp_invite'
+        context = {'error_message': "Please login before you continue"}
+        return render(request, 'potlucks/desktop/user_login.html', context)
+    event = Event.objects.get(pk=event_id)
+    context = {'event': event}
+    return render(request, 'potlucks/desktop/event_rsvp_invite.html', context)
+
+def event_rsvp_action(request):
+    if not request.user.is_authenticated:
+        request.session['rsvp'] = request.POST.get('rsvp', '')
+        if request.session['rsvp'] == '2':
+            request.session['dish_id'] = request.POST['dish_id']
+        request.session['event_id'] = request.POST.get('event_id', '')
+        request.session['target_view'] = 'potlucks:event_rsvp_action'
+        context = {'error_message': "Please login before you continue"}
+        return render(request, 'potlucks/desktop/user_login.html', context)
+    
+    user = request.user
+    event_id = request.POST.get('event_id', '')
+    if event_id == '':
+        event_id = request.session['event_id']
+    event = Event.objects.get(pk=event_id)
+
+    if not event.guest_instance_set.filter(email=user.email).exists():
+        event.guest_instance_set.create(email=user.email, guest=user)
+    instance = event.guest_instance_set.get(email=user.email)
+    if 'rsvp' not in request.POST:
+        rsvp = request.session['rsvp']
+    else:
+        rsvp = request.POST['rsvp']
+    instance.rsvp_status=int(rsvp)
+    if rsvp == '2':
+        dish_assigned = request.POST.get('dish_id', '')
+        if dish_assigned == '':
+            dish_assigned = request.session['dish_id']
+        dish = event.assignment_set.get(id=dish_assigned)
+        dish.assignment_status=True
+        dish.save()
+        instance.assignment = dish
+    instance.save()
+    event.save()
+    context = {'event': event, 'guest_instance': instance}
+    return render(request, 'potlucks/desktop/event_details.html', context)
+
+def event_rsvp_change(request):
+    user = request.user
+    event_id = request.POST['event_id']
+    event = Event.objects.get(pk=event_id)
+    instance = event.guest_instance_set.get(email=user.email)
+    instance.rsvp_status=int(request.POST['rsvp'])
+    if request.POST['rsvp'] == '3':
+        assignment = instance.assignment
+        assignment.assignment_status = False
+        assignment.save()
+        instance.assignment = None
+    if request.POST['rsvp'] == '2':
+        if instance.assignment is not None:
+            instance.assignment.assignment_status = False;
+            instance.assignment.save()
+        dish_assigned = request.POST.get('dish_id', 0)
+        dish = event.assignment_set.get(id=dish_assigned)
+        dish.assignment_status=True
+        dish.save()
+        instance.assignment = dish
+    instance.save()
+    context = {'event': event, 'guest_instance': instance}
+    return render(request, 'potlucks/desktop/event_details.html', context)
 
 def event_dishes(request):
     user = request.user
@@ -220,7 +293,7 @@ def event_enter_guest(request):
     event_id = request.POST['id']
     event = Event.objects.get(pk=event_id)
     guest_email = request.POST['email']
-    g_instance = event.guest_instance_set.create(email=guest_email, rsvp_status=False)
+    g_instance = event.guest_instance_set.create(email=guest_email)
     guest_user = User.objects.filter(email=guest_email)
     if guest_user.exists():
         guest_user = User.objects.get(email=guest_email)

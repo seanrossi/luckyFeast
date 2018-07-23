@@ -3,8 +3,8 @@
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/forms.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
 <div class="main">
-<h1>This is the user login page</h1>
-
+<h1>Login</h1>
+<h3><a href="{% url 'potlucks:user_register' %}">New User? Register here!</a></h3>
 <!--Check for error message and display-->
 {% if error_message %}
 <p><strong>{{ error_message }}</strong></p>

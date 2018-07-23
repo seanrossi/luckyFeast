@@ -1,0 +1,73 @@
+{% include "potlucks/navbar.html" %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/table-list.css' %}">
+<div class="main">
+<h1>{{ event.name }} Details</h1>
+<form action="{% url 'potlucks:event_rsvp_action' %}" method="POST">
+{% csrf_token %}
+<input type="hidden" name="event_id" value="{{ event.pk }}" />
+<input type="radio" name="rsvp" value="2" />Going</input>
+<input type="radio" name="rsvp" value="3" />Not Going</input>
+<br><br>
+
+<!--DISPLAY EVENT PARAMETERS HERE-->
+<div style="width: 100%; display:block;">
+  <div style="width: 15%; position:relative; float: left;">
+    <h3>Address</h3>
+    {{ event.address }}
+  </div>
+  <div style="width: 15%; position:relative; float:left;">
+    <h3>City</h3>
+    {{ event.city }}
+  </div>
+  <div style="width: 15%;position:relative; float: left;">
+    <h3>Zip</h3>
+    {{ event.zipcode }}
+  </div>
+  <div style="width: 25%;position:relative; float: left">
+    <h3>Start</h3>
+    {{ event.start_time }}
+  </div>
+  <div style="width: 30%;position:relative; float: left">
+    <h3>End</h3>
+    {{ event.end_time }}
+  </div>
+</div>
+
+<!--TABLE DISPLAY FOR DISH ASSIGNMENT LIST-->
+<div class="table-list" id="dish_table" style="margin-top:20px; float: left; width: 50%;">
+<h2>This is the dish assignment list</h2>
+<table>
+{% for dish in event.assignment_set.all %}
+    <tr>
+    <td><input type="radio" name="dish_id" value="{{ dish.pk }}" /></td>
+    <td>{{ dish.dish_type }}</td>
+    <td>{{ dish.assignment_status }}</td>
+    </tr>
+{% endfor %}
+</table>
+<input type="submit" value="Confirm RSVP" />
+</form>
+</div>
+
+<!--TABLE DISPLAY FOR GUEST LIST-->
+<div class="table-list" id="guest_table" style="margin-top: 20px; float: left; width: 50%;">
+<h2>This is the guest list</h2>
+<table>
+{% for guest in event.guest_instance_set.all %}
+    <tr>
+    <td>{% if guest.guest %}{{ guest.guest.username }}{% else %}{{ guest.email }}{% endif %}</td>
+    <td>{% if guest.rsvp_status is True %} Yes {% else %} No {% endif %}</td>
+    </tr>
+{% endfor %}
+</table>
+{% if event.host == request.user %} 
+    <form action="{% url 'potlucks:event_add_guests' %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="event_id" value="{{ event.pk }}" />
+    <input type="submit" value="Add Guests" />
+    </form>
+{% endif %}
+</div>
+</div>

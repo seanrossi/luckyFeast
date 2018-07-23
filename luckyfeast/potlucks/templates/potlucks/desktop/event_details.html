@@ -4,12 +4,38 @@
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/table-list.css' %}">
 <div class="main">
 <h1>{{ event.name }} Details</h1>
+<div class="table-list" >
+<table style="border: blue solid 2px;">
+<th>Going?</th>
+{% if guest_instance.rsvp_status == 2 %}
+<th>Dish</th>
+{% endif %}
+<tr>
+<td>{{ guest_instance.get_rsvp_status_display }}</td>
+{% if guest_instance.rsvp_status == 2 %}
+<td>{{ guest_instance.assignment.dish_type }}</td>
+{% endif %}
+</tr>
+</table>
+</div>
+<br>
 {% if event.host == request.user %} 
     <form action="{% url 'potlucks:event_cancel' %}" method="POST">
     {% csrf_token %}
     <input type="hidden" name="event_id" value="{{ event.pk }}" />
     <input type="submit" value="Cancel Event" />
+    </form>
+{% else %}
+
+<form action="{% url 'potlucks:event_rsvp_change' %}" method="POST">
+{% csrf_token %}
+<input type="hidden" name="event_id" value="{{ event.pk }}" />
+<input type="radio" name="rsvp" value="2" id="radioGoing" />Going</input>
+<input type="radio" name="rsvp" value="3" id="notGoing" checked="checked" />Not Going</input>
+<br><br>
+
 {% endif %}
+
 <!--DISPLAY EVENT PARAMETERS HERE-->
 <div style="width: 100%; display:block;">
 <div style="width: 15%; position:relative; float: left;">
@@ -34,26 +60,20 @@
 </div>
 </div>
 
+
+
 <!--TABLE DISPLAY FOR DISH ASSIGNMENT LIST-->
 <div class="table-list" id="dish_table" style="margin-top:20px; float: left; width: 50%;">
 <h2>This is the dish assignment list</h2>
 <table>
-    {% if event.host != request.user %}
-    <tr>
-    <td>{{ guest_instance.assignment.dish_type }}</td>
-    </tr>
-    {% endif %}
 {% for dish in event.assignment_set.all %}
     <tr>
     <td>{{ dish.dish_type }}</td>
-    <td>{{ dish.assignment_status }}</td>
-    <td>
-        <form action="{% url 'potlucks:event_assign_dish' %}" method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="event_id" value="{{ event.pk }}" />
-        <input type="hidden" name="dish_id" value="{{ dish.pk }}" />
-        <td><input type="submit" value="Accept Dish" /></td>
-        </form>
+    <td>{% if dish.assignment_status %}
+        Assigned
+        {% else %}
+        Unassigned
+        {% endif %}
     </td>
     {% if event.host == request.user %} 
         <form action="{% url 'potlucks:event_remove_dish' %}" method="POST">
@@ -63,9 +83,12 @@
         <td><input type="submit" value="Remove Dish" /></td>
         </form>
     {% endif %}
+    <td><input type="radio" name="dish_id" class="dishRadio" value="{{ dish.pk }}" /></td>
     </tr>
 {% endfor %}
 </table>
+<input type="submit" value="Change RSVP/Dish" id="submitButton"/>
+</form>
 {% if event.host == request.user %} 
     <form action="{% url 'potlucks:event_dishes' %}" method="POST">
     {% csrf_token %}
@@ -82,7 +105,7 @@
 {% for guest in event.guest_instance_set.all %}
     <tr>
     <td>{% if guest.guest %}{{ guest.guest.username }}{% else %}{{ guest.email }}{% endif %}</td>
-    <td>{% if guest.rsvp_status is True %} Yes {% else %} No {% endif %}</td>
+    <td>{{ guest.get_rsvp_status_display }}</td>
     </tr>
 {% endfor %}
 </table>
@@ -96,3 +119,31 @@
 </div>
 
 </div>
+
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
+<script>
+  $(document).ready(function()
+  {
+    $("#radioGoing").change(function()
+    {
+      if( $("#radioGoing").is(':checked'))
+      {
+        $("#submitButton").prop('disabled', true);
+      }
+    });
+    $("#notGoing").change(function()
+    {
+      if( $("#notGoing").is(':checked'))
+      {
+        $("#submitButton").prop('disabled', false);
+      }
+    });
+    $(".dishRadio").change(function()
+    {
+      if( $(".dishRadio").is(':checked'))
+      {
+        $("#submitButton").prop('disabled', false);
+      }
+    });
+  });
+</script>

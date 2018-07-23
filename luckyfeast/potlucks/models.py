@@ -36,7 +36,15 @@ class Guest_Instance(models.Model):
     guest = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     email = models.CharField(max_length=30, default="")
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    rsvp_status = models.BooleanField(default=False)
+    RSVP_UNDECIDED = 1
+    RSVP_YES = 2
+    RSVP_NO = 3
+    RSVP_CHOICES = (
+        (RSVP_UNDECIDED, 'Undecided'),
+        (RSVP_YES, 'Yes'),
+        (RSVP_NO, 'No')
+    )
+    rsvp_status = models.IntegerField(choices=RSVP_CHOICES, default=RSVP_UNDECIDED)
     assignment = models.ForeignKey(Assignment, on_delete=models.SET_NULL, null=True)
        
 class Ingredient(models.Model):

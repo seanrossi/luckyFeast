@@ -4,8 +4,10 @@
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/forms.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
 <div class="main">
-<h1>This is the user registration page</h1>
-
+<h1>Create an Account</h1>
+{% if help_message %}a
+<p><strong>{{ help_message }}</strong></p>
+{% endif %}
 <!--Create unordered list of username to filter-->
 <!--This will be replaced with AJAX implementation-->
 <ul id="userUl" style="display:none;">
