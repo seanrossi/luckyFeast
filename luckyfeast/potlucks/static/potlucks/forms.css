@@ -1,26 +1,31 @@
 .forms {
     width: 80%;
-    position: relative;
-    float: left;
     text-indent: 0px;
 }
 
 .forms ul {
-    float: left;
-    margin-left: 0px;
-    padding-left: 0px;
     text-decoration: none;
     list-style-type: none;
 }
 
 .forms li {
-    margin-left: 0px;
-    padding-left: 0px;
     padding-bottom: 20px;
     text-decoration: none;
     list-style-type: none;
 }
 
+.forms input {
+    width: 14em;
+    font-size: 20px;
+    border-radius: 5px;
+    border: solid green 1px;
+}
+
+.forms input[type=submit] {
+    background: linear-gradient(lawngreen, green);
+    color: white;
+    font-weight: bold;
+}
 
 .forms-input {
     display: inline;
@@ -29,7 +34,7 @@
 .forms-help {
     position: relative;
     display: none; 
-    float: right;
+    width: 14em;
     margin-top: 5px;
     margin-left: 10px;
 }

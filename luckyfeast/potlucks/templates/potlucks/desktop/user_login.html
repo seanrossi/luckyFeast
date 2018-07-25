@@ -2,27 +2,46 @@
 {% load static %}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/forms.css' %}">
+
+<style>
+.center-float {
+    float: none;
+}
+</style>
+
 <div class="container" style="padding-top: 70px;">
-<h1>Login</h1>
-<h3><a href="{% url 'potlucks:user_register' %}">New User? Register here!</a></h3>
 <!--Check for error message and display-->
 {% if error_message %}
 <p><strong>{{ error_message }}</strong></p>
 {% endif %}
-
-<div class="forms">
-<form action='{% url "potlucks:user_auth" %}' method='post'>
-{% csrf_token %}
-<ul>
-    <li><b>Username:</b><br>
-    <input type="text" name="username" /></li>
-    <li><b>Password:</b><br>
-    <input type="password" name="password" /></li>
-    <li><input type="submit" value="Login" /></li>
-</ul>
-</form>
+<div class="row">
+  <div class="text-center">
+    <h1>Login</h1>
+  </div>
+  <br>
+  <!--<div class="col-sm-2 col-sm-offset-4">-->
+  <div class="col-xs-12 col-sm-2 col-sm-offset-4">
+    <div class="forms">
+      <form action='{% url "potlucks:user_auth" %}' method='post'>
+        {% csrf_token %}
+        <ul>
+          <li><b>Username:</b><br>
+            <input type="text" name="username" /></li><br>
+          <li><b>Password:</b><br>
+            <input type="password" name="password" /></li><br>
+          <li><input type="submit" value="Login" style="width: 14em;" /></li>
+        </ul>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="text-center">
+    <h4><a href="{% url 'potlucks:user_register' %}">New to Lucky Feast? Register here.</a></h4>
+  </div>
 </div>
 </div>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>

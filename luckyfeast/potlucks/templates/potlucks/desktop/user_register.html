@@ -7,7 +7,10 @@
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/forms.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
 <div class="container" style="padding-top: 70px">
+<div class="row">
+<div class="text-center">
 <h1>Create an Account</h1>
+</div>
 {% if help_message %}a
 <p><strong>{{ help_message }}</strong></p>
 {% endif %}
@@ -21,6 +24,7 @@
 
 <!--Create forms for user creation-->
 <!--First and Last names are optional-->
+<div class="col-xs-12 col-sm-2 col-sm-offset-4">
 <div class="forms">
 <form action="{% url 'potlucks:user_enter' %}" method='POST'>
     {% csrf_token %}
@@ -45,6 +49,8 @@
     
         <li><input id="register_btn" type="submit" value="Register" /></li>
 </form>
+</div>
+</div>
 </div>
 </div>
 
@@ -89,35 +95,6 @@ $(document).ready(function()
   });
 });
 
-/*function userLookup()
-{
-    var ul = document.getElementById("userUl");
-    var li = document.getElementsByClassName("userListItem");
-    var input = document.getElementById("userInput");
-    var filter = input.value.toUpperCase();
-    var name_taken = false;
-    var name_available_p = document.getElementById("nameAvailable");
-    name_available_p.innerHTML = "This should update";
-    for( i = 0; i < li.length; i++ )
-    {
-        a = li[i].getElementsByTagName("a")[0];
-        if( a.innerHTML.toUpperCase().indexOf(filter) > -1 )
-        {
-            name_taken = true;
-        }
-    }
-
-    if( name_taken )
-    {
-        name_available_p.innerHTML = "Username is already taken";
-        name_available_p.style.color = "red";
-    }
-    else
-    {
-        name_available_p.innerHTML = "Username is available";
-        name_available_p.style.color = "green";
-    }
-}*/
 </script>
 
 </html>

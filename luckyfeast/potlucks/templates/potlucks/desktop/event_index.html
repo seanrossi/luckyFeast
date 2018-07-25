@@ -6,44 +6,59 @@
 <link rel="stylesheet" type="text/css" href='{% static "potlucks/main.css" %}'>
 <link rel="stylesheet" type="text/css" href='{% static "potlucks/table-list.css" %}'>
 
-<div class="container-fluid" style="padding-top: 70px;">
+<div class="container" style="padding-top: 70px;">
 <h1>My Events</h1>
 
 <!--Make table for hosted events-->
-<div class="row">
 <div class="col-sm-6">
-<div class="table-list" id="hosted_table">
-<h2>Events that I am hosting:</h2>
-<table>
-<tr><th>Event Name</th><th>Event Start</th><th>Event End</th></tr>
-{% for event in event_list %}
-    <tr><td>{{ event.name }}</a></td>
-        <td>{{ event.start_time }}</td>
-        <td><form action="{% url 'potlucks:event_details' %}" method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="event_id" value="{{ event.pk }}" />
-            <input type="submit" value="Event Details" /></form></td></tr>
-{% endfor %}
-</table>
-</div>
+  <h2>Events I'm hosting:</h2>
+  <div class="row">
+    {% for event in event_list %}
+    <div class="col-sm-6 col-xs-12" style="background-color:aquamarine; display:inline-block;" style="cursor:pointer !important;" onclick="loadEvent('{{ event.pk }}');">
+    <h3>{{ event.name }}</h3>
+      <div class="row">
+        <div class="col-xs-6"><h5>{{ event.start_time }}</h5></div>
+        <div class="col-xs-6"><h5>{{ event.rsvp_count }} Guests Confirmed</h5></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 </div>
 
 <!--Make second table for invited events-->
 <div class="col-sm-6">
-<div class="table-list" id="invited-table">
-<h2>Events that I am invited to:</h2>
-<table>
-<tr><th>Event Name</th><th>Event Start</th><th>Event End</th></tr>
+<h2>Events I'm attending:</h2>
+<div class="row">
 {% for instance in invited_list %}
-    <tr><td>{{ instance.event.name }}</a></td>
-        <td>{{ instance.event.start_time }}</td>
-        <td><form action="{% url 'potlucks:event_details' %}" method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="event_id" value="{{ instance.event.pk }}" />
-            <input type="submit" value="Event Details" /></form></td></tr>
+<div class="col-sm-6 col-xs-12" style="background-color:palegreen; display:inline-block;" style="cursor:pointer !important;" onclick="loadEvent('{{ instance.event.pk }}');">
+<h3>{{ instance.event.name }}</h3>
+<div class="row">
+<div class="col-sm-6"><h5>{{ instance.event.start_time }}</h5></div></div></div>
 {% endfor %}
-</table>
 </div>
 </div>
 </div>
 </div>
+</div>
+</div>
+
+<script>
+function loadEvent( eventId )
+{
+  var form = document.createElement('form');
+  form.setAttribute('method', 'POST');
+  form.setAttribute('action', "{% url 'potlucks:event_details' %} ");
+  var job = document.createElement('input');
+  job.setAttribute('type', 'hidden');
+  job.setAttribute('name', 'event_id');
+  job.setAttribute('value', eventId);
+  var inputToken = document.createElement('input');
+  inputToken.setAttribute('type', 'hidden');
+  inputToken.name = 'csrfmiddlewaretoken';
+  inputToken.value = '{{ csrf_token }}';
+  form.appendChild(job);
+  form.appendChild(inputToken);
+  document.body.appendChild(form);
+  form.submit();
+}
+</script>
