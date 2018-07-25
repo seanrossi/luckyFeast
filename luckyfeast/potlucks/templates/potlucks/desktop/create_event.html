@@ -9,50 +9,89 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/forms.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
+
+<style>
+  .inner-addon {
+    position:relative;
+}
+  .inner-addon .glyphicon {
+    position: absolute;
+    padding: 10px;
+}
+  .right-addon .glyphicon { right: 0px; }
+  .left-addon .glyphicon { left: 0px; }
+
+  .left-addon input { padding-left: 30px; }
+
+  [class*="col-sm-12"] {
+    padding-bottom:20px;
+}
+  [class*="col-xs-12"] {
+    padding-bottom:0px;
+}
+</style>
+
 </head>
 <body>
-<div class="container" style="padding-top: 70px">
-<h1>This is the event creation page</h1>
+<div class="container" style="padding-top: 50px">
+<div class="row" style="display:inline-block;">
+<div class="col-sm-12 col-xs-12" style="display:inline;">
+<h1 style="font-size:48px;">Create Event</h1>
+</div>
+</div>
 
 <div class="forms">
 <form action="{% url 'potlucks:event_enter' %}" method="POST">
 {% csrf_token %}
+<div class="row">
+<ul style="padding-left: 0;">
+<div class="col-sm-6" style="display:inline-block;">
+    <li><label for="nameInput">Event Name</label><br>
+    <input type="text" class="form-control" name="event_name" id="nameInput" required/></li>
 
-<ul>
-    <li><b>Event Name:</b><br>
-    <input type="text" name="event_name" required/></li>
+    <li><label for="keyInput">Event Key:</label>(Optional)<br>
+    <input type="text" name="event_key" id="keyInput" pattern="[a-zA-Z0-9]+" /></li>
 
-    <li><b>Event Key:</b>(Optional)<br>
-    <input type="text" name="event_key" pattern="[a-zA-Z0-9]+" /></li>
-
-    <li><b>Start Date:</b><br>
-    <input type="text" name="start_date"  id="startDate" required />
-    <input type="text" name="start_time" class="timepicker" id="startTime"/>
-    </li>
+    <li><label for="locationInput">Location:</label><br>
+    <input type="text" id="locationInput" name="address" title="Numerical address and street" pattern="[0-9]+[A-Za-z0-9\s]+" required /></li>
+    </div>
+    <div class="col-sm-6" style="display:inline-block;">
+      <li><label for="startDate">Start Date:</label><br>
+        <div class="row">
+          <div class="col-xs-6 col-lg-4">
+          <div class="inner-addon left-addon"><i class="glyphicon glyphicon-calendar"></i>
+            <input type="text" name="start_date" id="startDate" style="width:7em" required />
+</div>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+          <div class="inner-addon left-addon"><i class="glyphicon glyphicon-dashboard"></i>
+            <input type="text" name="start_time" class="timepicker" style="width:6em" id="startTime"/></div>
+          </div>
+        </div>
+      </li>
     
-    <li><b>End Date:</b><br>
-    <input type="text" name="end_date"  id="endDate" required />
-    <input type="text" name="end_time" class="timepicker" id="endTime"/>
-    </li>
-
-    <li><b>Address:</b><br>
-    <input type="text" name="address" title="Numerical address and street" pattern="[0-9]+[A-Za-z0-9\s]+" required /></li>
-
-    <li><b>Apt:</b><br>
-    <input type="text" name="apt" /></li>
-
-    <li><b>City:</b><br>
-    <input type="text" name="city" title="Letters only" pattern="[A-Za-z\s]+" required /></li>
-
-    <li><b>State:</b><br>
-    <input type="text" name="state" title="2 character state code" pattern="[A-Za-z]{2}" required /></li>
-
-    <li><b>Zipcode:</b><br>
-    <input type="text" name="zipcode" title="5 digit zipcode" pattern="[0-9]{5}" required /></li>
-
-    <input type="submit" value="Create Event" />
+      <li><label for="endDate">End Date:</label><br>
+        <div class="row">
+          <div class="col-xs-6 col-sm-4">
+          <div class="inner-addon left-addon"><i class="glyphicon glyphicon-calendar"></i>
+            <input type="text" name="end_date"  id="endDate" style="width:7em" required /></div>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+          <div class="inner-addon left-addon"><i class="glyphicon glyphicon-dashboard"></i>
+            <input type="text" name="end_time" class="timepicker" style="width:6em" id="endTime"/></div>
+          </div>
+        </div>
+      </li>
+    </div>
+</div>
+      <div class="row">
+      <div class="col-xs-6 col-sm-6">
+      <br><li><input type="submit" id="create" value="Create Event" /></li>
+      </div>
+      </div>
 </ul>
 </form>
+</div>
 </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>

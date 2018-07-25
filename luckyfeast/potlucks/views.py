@@ -79,7 +79,7 @@ def user_enter(request):
     return HttpResponseRedirect(reverse(request.session['target_view']))
 
 def user_profile(request):
-    return render(request, 'potlucks/user_profile.html')
+    return render(request, 'potlucks/desktop/user_profile.html')
 
 def event_index(request):
     if not request.user.is_authenticated:
@@ -94,7 +94,7 @@ def event_index(request):
 def create_event(request):
     if not request.user.is_authenticated:
         request.session['target_view'] = 'potlucks:create_event'
-        return render(request, 'potlucks/user_login.html')
+        return render(request, 'potlucks/desktop/user_login.html')
     context = {'days':range(1, 32), 'hours':range(12), 'minutes':range(60)}
     return render(request, 'potlucks/desktop/create_event.html', context)
 
@@ -115,31 +115,22 @@ def event_enter(request):
     user = request.user
     event_name = request.POST['event_name']
     startDate = request.POST['start_date']
-    startHour = int(request.POST['startHour'])
-    startMinute = int(request.POST['startMinute'])
-    startAm = request.POST['startAm']
-    if startAm == "pm":
-        startHour += 12
-    formatString = '%m/%d/%Y'
+    startDate += ' ' + request.POST['start_time']
+    formatString = '%m/%d/%Y %I:%M %p'
     start = datetime.datetime.strptime(startDate, formatString)
-    start = start.replace(hour=startHour, minute=startMinute)    
-
+    
     endDate = request.POST['end_date']
-    endHour = int(request.POST['endHour'])
-    endMinute = int(request.POST['endMinute'])
-    endAm = request.POST['endAm']
-    if endAm == "pm":
-        endHour += 12
-    end = datetime.datetime.strptime(startDate, formatString)
-    end = end.replace(hour=endHour, minute=endMinute)    
+    endDate += ' ' + request.POST['end_time']
+    end = datetime.datetime.strptime(endDate, formatString)
 
     address = request.POST['address']
-    apt = request.POST['apt']
-    city = request.POST['city']
-    state = request.POST['state']
-    zipcode = request.POST['zipcode']
+    #apt = request.POST['apt']
+    #city = request.POST['city']
+    #state = request.POST['state']
+    #zipcode = request.POST['zipcode']
 
-    event = user.event_set.create(name=event_name, host=request.user, start_time=start, end_time=end, address=address, apt=apt, city=city, state=state, zipcode=zipcode)
+    #event = user.event_set.create(name=event_name, host=request.user, start_time=start, end_time=end, address=address, apt=apt, city=city, state=state, zipcode=zipcode)
+    event = user.event_set.create(name=event_name, host=request.user, start_time=start, end_time=end, location=address)
     if request.POST['event_key'] != "":
         event.event_key = request.POST['event_key']
         event.save()

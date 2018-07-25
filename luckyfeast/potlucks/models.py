@@ -10,11 +10,12 @@ class Event(models.Model):
     host = models.ForeignKey(User, on_delete=models.CASCADE)
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(default=timezone.now)
-    address = models.CharField(max_length=30, default="")
-    apt = models.CharField(max_length=6, default="")
-    city = models.CharField(max_length=30, default="")
-    state = models.CharField(max_length=2, default="")
-    zipcode = models.CharField(max_length=5, default="")
+    location = models.CharField(max_length=50, default="")
+    #address = models.CharField(max_length=30, default="")
+    #apt = models.CharField(max_length=6, default="")
+    #city = models.CharField(max_length=30, default="")
+    #state = models.CharField(max_length=2, default="")
+    #zipcode = models.CharField(max_length=5, default="")
     rsvp_count = models.IntegerField(default=0)
 
 class Dish_Type_Main(models.Model):

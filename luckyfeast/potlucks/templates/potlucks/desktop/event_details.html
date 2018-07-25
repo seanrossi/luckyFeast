@@ -5,8 +5,9 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/table-list.css' %}">
-<div class="container-fluid" style="padding-top: 70px;">
-<h1>{{ event.name }} Details</h1>
+
+<div class="container main">
+<h1>{{ event.name }}</h1>
 {% if request.user != event.host %}
 <div class="table-list" >
 <table style="border: blue solid 2px;">
@@ -44,17 +45,9 @@
 <!--DISPLAY EVENT PARAMETERS HERE-->
 <div class="container">
 <div class="row">
-<div class="col-xs-4 col-sm-2">
-<h3>Address</h3>
-{{ event.address }}
-</div>
-<div class="col-xs-4 col-sm-2">
-<h3>City</h3>
-{{ event.city }}
-</div>
-<div class="col-xs-4 col-sm-2">
-<h3>Zip</h3>
-{{ event.zipcode }}
+<div class="col-xs-12 col-sm-3">
+<h3>Location</h3>
+{{ event.location }}
 </div>
 <div class="clearfix visible-xs"></div>
 <div class="col-xs-6 col-sm-3">
@@ -67,76 +60,74 @@
 </div>
 </div>
 </div>
-
+<br>
 
 <!--TABLE DISPLAY FOR DISH ASSIGNMENT LIST-->
 <div class="row">
 <div class="col-sm-6">
-<div class="table-list" id="dish_table">
-<h2>Dishes</h2>
-<table>
-    <tr><th>Dish Type</th><th>Assigned?</th></tr>
-{% for dish in event.assignment_set.all %}
-    <tr>
-    <td>{{ dish.dish_type }}</td>
-    <td>{% if dish.assignment_status %}
-        Assigned
+  <div class="row"><div class="col-sm-2 col-sm-offset-2">
+  <h2>Dishes</h2></div></div>
+  {% for dish in event.assignment_set.all %}
+    <div class="row">
+      <div class="col-sm-6 col-xs-12" style="background-color:aquamarine; display:inline-block;">
+      <div class="col-xs-5"><h5>{{ dish.dish_type }}</h5></div>
+      <div class="col-xs-5"><h5>
+        {% if dish.assignment_status %}
+          Assigned
         {% else %}
-        Unassigned
-        {% endif %}
-    </td>
-    {% if event.host == request.user %} 
-        <form action="{% url 'potlucks:event_remove_dish' %}" method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="event_id" value="{{ event.pk }}" />
-        <input type="hidden" name="dish_id" value="{{ dish.pk }}" />
-        <td><input type="submit" value="Remove" /></td>
-        </form>
-    {% else %}
-        <td><input type="radio" name="dish_id" class="dishRadio" value="{{ dish.pk }}" /></td>
-    {% endif %}
-    </tr>
-{% endfor %}
-</table>
+          Unassigned
+        {% endif %}</h5>
+      </div>
+      {% if event.host == request.user %} 
+        <div class="col-xs-2" onclick="removeDish('{{ event.pk }}', '{{ dish.pk }}');"><h5><span class="glyphicon glyphicon-remove"/></h5></div>
+      {% endif %}
+    </div>
+    </div>
+    <br>
+  {% endfor %}
 {% if request.user != event.host %}
 <input type="submit" value="Change RSVP/Dish" id="submitButton"/>
 </form>
 {% endif %}
 {% if event.host == request.user %} 
-    <form action="{% url 'potlucks:event_dishes' %}" method="POST">
-    {% csrf_token %}
-    <input type="hidden" name="event_id" value="{{ event.pk }}" />
-    <input type="submit" value="Add Dish" />
+  <div class="row">
+    <div class="col-sm-6 col-xs-12" style="text-align:center; background-color:aquamarine; display:inline-block;" onclick="addDish('{{ event.pk }}');">
+      <h5><span class="glyphicon glyphicon-plus"/></h5>
+    </form>
+    </div>
+  </div>
 {% endif %}
-</form>
-</div>
 </div>
 
 <!--TABLE DISPLAY FOR GUEST LIST-->
 <div class="col-sm-6">
-<div class="table-list" id="guest_table">
-<h2>Guests</h2>
-<table>
-    <tr><th>Guest</th><th>Going?</th></tr>
+  <div class="row"><div class="col-sm-2 col-sm-offset-2">
+    <h2>Guests</h2>
+  </div></div>
 {% for guest in event.guest_instance_set.all %}
-    <tr>
-    <td>{% if guest.guest %}
+  <div class="row">
+      <div class="col-sm-6 col-xs-12" style="background-color:aquamarine; display:inline-block;">
+      <div class="col-xs-6"><h5>
+        {% if guest.guest %}
         {% if guest.guest.first_name != '' %}{{ guest.guest.first_name }}
         {% else %}
         {{ guest.guest.username }}{% endif %}
-        {% else %}{{ guest.email }}{% endif %}</td>
-    <td>{{ guest.get_rsvp_status_display }}</td>
-    </tr>
+        {% else %}{{ guest.email }}{% endif %}</h5>
+      </div>
+      <div class="col-xs-6"><h5>
+      {{ guest.get_rsvp_status_display }}
+      </h5></div>
+  </div>
+  </div>
+<br>
 {% endfor %}
-</table>
 {% if event.host == request.user %} 
-    <form action="{% url 'potlucks:event_add_guests' %}" method="POST">
-    {% csrf_token %}
-    <input type="hidden" name="event_id" value="{{ event.pk }}" />
-    <input type="submit" value="Add Guests" />
-    </form>
+  <div class="row">
+    <div class="col-sm-6 col-xs-12" style="text-align:center; background-color:aquamarine; display:inline-block;" onclick="addGuest('{{ event.pk }}');">
+      <h5><span class="glyphicon glyphicon-plus"/></h5>
+    </div>
+  </div>
 {% endif %}
-</div>
 </div>
 </div>
 </div>
@@ -167,4 +158,67 @@
       }
     });
   });
+
+function addGuest( eventId )
+{
+  var form = document.createElement('form');
+  form.setAttribute('method', 'POST');
+  form.setAttribute('action', "{% url 'potlucks:event_add_guests' %} ");
+  var job = document.createElement('input');
+  job.setAttribute('type', 'hidden');
+  job.setAttribute('name', 'event_id');
+  job.setAttribute('value', eventId);
+  var inputToken = document.createElement('input');
+  inputToken.setAttribute('type', 'hidden');
+  inputToken.name = 'csrfmiddlewaretoken';
+  inputToken.value = '{{ csrf_token }}';
+  form.appendChild(job);
+  form.appendChild(inputToken);
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function addDish( eventId )
+{
+  var form = document.createElement('form');
+  form.setAttribute('method', 'POST');
+  form.setAttribute('action', "{% url 'potlucks:event_dishes' %} ");
+  var job = document.createElement('input');
+  job.setAttribute('type', 'hidden');
+  job.setAttribute('name', 'event_id');
+  job.setAttribute('value', eventId);
+  var inputToken = document.createElement('input');
+  inputToken.setAttribute('type', 'hidden');
+  inputToken.name = 'csrfmiddlewaretoken';
+  inputToken.value = '{{ csrf_token }}';
+  form.appendChild(job);
+  form.appendChild(inputToken);
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function removeDish( eventId, dishId )
+{
+  var form = document.createElement('form');
+  form.setAttribute('method', 'POST');
+  form.setAttribute('action', "{% url 'potlucks:event_remove_dish' %} ");
+  var job = document.createElement('input');
+  job.setAttribute('type', 'hidden');
+  job.setAttribute('name', 'event_id');
+  job.setAttribute('value', eventId);
+  var dish = document.createElement('input');
+  dish.setAttribute('type', 'hidden');
+  dish.setAttribute('name', 'dish_id');
+  dish.setAttribute('value', dishId);
+  var inputToken = document.createElement('input');
+  inputToken.setAttribute('type', 'hidden');
+  inputToken.name = 'csrfmiddlewaretoken';
+  inputToken.value = '{{ csrf_token }}';
+  form.appendChild(job);
+  form.appendChild(dish);
+  form.appendChild(inputToken);
+  document.body.appendChild(form);
+  form.submit();
+}
+
 </script>
