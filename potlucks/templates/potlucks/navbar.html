@@ -1,0 +1,26 @@
+{% load static %}
+<html>
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/navbar.css' %}">
+<div class="navbar">
+<div class="navbar_left">
+<ul>
+    <li><b><a href='{% url 'potlucks:event_index' %}'>My Events</a></b></li>
+    <li><b><a href='{% url 'potlucks:create_event' %}'>Create Event</a></b></li>
+    <li><b><a href=''>Recipes</a></b></li>
+</ul>   
+</div>
+<div class="navbar_right">
+{% if request.user.is_authenticated %}
+<ul>
+    <li><b><a href='{% url 'potlucks:user_logout' %}'>Logout</a></b></li>
+    <li><b><a href='{% url 'potlucks:user_profile' %}'>{{ request.user.username }}</a></b></li>
+</ul>
+{% else %}
+<ul>
+    <li><b><a href='{% url 'potlucks:user_register' %}'>Register</a></b></li>
+    <li><b><a href='{% url 'potlucks:user_login' %}'>Login</a></b></li>
+</ul>
+{% endif %}
+</div>
+</div>
+</html>
