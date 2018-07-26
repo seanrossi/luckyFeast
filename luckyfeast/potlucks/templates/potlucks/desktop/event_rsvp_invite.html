@@ -5,29 +5,33 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/table-list.css' %}">
-<div class="container-fluid" style="padding-top: 70px">
-<h1>{{ event.name }} Details</h1>
-<form action="{% url 'potlucks:event_rsvp_action' %}" method="POST">
-{% csrf_token %}
-<input type="hidden" name="event_id" value="{{ event.pk }}" />
+
+<style>
+.bluBtn{ 
+  background-color:aquamarine; 
+  border:solid darkblue 2px; 
+  text-align:center; 
+  display:inline-block;  
+}
+.bluBtn h5{
+  font-weight: bold;
+}
+.bluBtn:hover{ background-color: mediumturquoise; }
+</style>
+
+<div class="container" style="padding-top: 70px">
+<h1 class="text-center">{{ event.name }}</h1>
+<!--
 <input type="radio" name="rsvp" value="2" id="radioGoing" />Going</input>
-<input type="radio" name="rsvp" value="3" id="notGoing" checked="checked" />Not Going</input>
-<br><br>
+<input type="radio" name="rsvp" value="3" id="notGoing" checked="checked" />Not Going</input>-->
+<br>
 
 <!--DISPLAY EVENT PARAMETERS HERE-->
 <div class="container">
-<div class="row">
-<div class="col-xs-4 col-sm-2">
-<h3>Address</h3>
-{{ event.address }}
-</div>
-<div class="col-xs-4 col-sm-2">
-<h3>City</h3>
-{{ event.city }}
-</div>
-<div class="col-xs-4 col-sm-2">
-<h3>Zip</h3>
-{{ event.zipcode }}
+<div class="row col-sm-offset-2">
+<div class="col-xs-12 col-sm-3">
+<h3>Location</h3>
+{{ event.location }}
 </div>
 <div class="clearfix visible-xs"></div>
 <div class="col-xs-6 col-sm-3">
@@ -41,28 +45,61 @@
 </div>
 </div>
 
-<!--TABLE DISPLAY FOR DISH ASSIGNMENT LIST-->
+<br>
 <div class="row">
+<div class="col-sm-6 col-sm-offset-3">
+<div class="row">
+  <h3 class="col-sm-2 col-sm-offset-5">Going?</h3>
+</div>
+<br>
+  <div class="col-xs-6 bluBtn" id="rsvpNo" onclick="rsvpActionNo('{{ event.pk }}');">
+    <h5>No</h5>
+  </div>
+  <div class="col-xs-6 bluBtn" id="rsvpYes">
+    <h5>Yes</h5>
+  </div>
+</div>
+</div>
+<br>
+<!--TABLE DISPLAY FOR DISH ASSIGNMENT LIST-->
+<!--<div class="row">
 <div class="col-sm-6">
 <div class="table-list" id="dish_table">
 <h2>Please choose a dish to bring</h2>
 <table>
-{% for dish in event.assignment_set.all %}
     <tr>
-    <td>{{ dish.dish_type }}</td>
-    <td>{{ dish.assignment_status }}</td>
     <td><input type="radio" name="dish_id" class="dishRadio" value="{{ dish.pk }}" /></td>
     </tr>
-{% endfor %}
 </table>
 <input type="submit" id="submitButton" value="Confirm RSVP" />
 </form>
 </div>
 </div>
+-->
+<!--TABLE DISPLAY FOR DISH ASSIGNMENT LIST-->
+<div class="row">
+<div class="col-sm-6" id="dishDiv" style="display:none;">
+  <div class="row"><div class="col-sm-6 col-sm-offset-10">
+  <h3>Bring which dish?</h3></div></div>
+  <br>
+  {% for dish in event.assignment_set.all %}
+    {% if not dish.assignment_status %}
+    <div class="row">
+      <div class="col-xs-8 col-sm-offset-8 bluBtn" onclick="rsvpActionYes('{{ event.pk }}', '{{ dish.pk }}');">
+      <h5>{{ dish.dish_type }}</h5>
+      </div>
+    </div>
+    <br>
+    {% endif %}
+  {% endfor %}
+  </div>
+</div>
+</div>
+
 
 <!--TABLE DISPLAY FOR GUEST LIST-->
 <div class="col-sm-6">
-<div class="table-list" id="guest_table">
+<div class="table-list" id="guest_table" style="display: none;">
 <h2>This is the guest list</h2>
 <table>
 <tr><th>Guest</th><th>Going?</th></tr>
@@ -77,6 +114,7 @@
     </tr>
 {% endfor %}
 </table>
+</div>
 </div>
 </div>
 </div>
@@ -107,6 +145,61 @@
         $("#submitButton").prop('disabled', false);
       }
     });
+
+    $("#rsvpYes").click(function(){
+      $("#dishDiv").show();
+    });
   });
+
+function rsvpActionNo( eventId ){
+  var form = document.createElement('form');
+  form.setAttribute('method', 'POST');
+  form.setAttribute('action', "{% url 'potlucks:event_rsvp_action' %} ");
+  var event_id = document.createElement('input');
+  event_id.setAttribute('type', 'hidden');
+  event_id.setAttribute('name', 'event_id');
+  event_id.setAttribute('value', eventId);
+  var rsvp_choice = document.createElement('input');
+  rsvp_choice.setAttribute('type', 'hidden');
+  rsvp_choice.setAttribute('name', 'rsvp');
+  rsvp_choice.setAttribute('value', "3");
+  var inputToken = document.createElement('input');
+  inputToken.setAttribute('type', 'hidden');
+  inputToken.name = 'csrfmiddlewaretoken';
+  inputToken.value = '{{ csrf_token }}';
+  form.appendChild(event_id);
+  form.appendChild(rsvp_choice);
+  form.appendChild(inputToken);
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function rsvpActionYes( eventId, dishId ){
+  var form = document.createElement('form');
+  form.setAttribute('method', 'POST');
+  form.setAttribute('action', "{% url 'potlucks:event_rsvp_action' %} ");
+  var event_id = document.createElement('input');
+  event_id.setAttribute('type', 'hidden');
+  event_id.setAttribute('name', 'event_id');
+  event_id.setAttribute('value', eventId);
+  var rsvp_choice = document.createElement('input');
+  rsvp_choice.setAttribute('type', 'hidden');
+  rsvp_choice.setAttribute('name', 'rsvp');
+  rsvp_choice.setAttribute('value', "2");
+  var dish_id = document.createElement('input');
+  dish_id.setAttribute('type', 'hidden');
+  dish_id.setAttribute('name', 'dish_id');
+  dish_id.setAttribute('value', dishId);
+  var inputToken = document.createElement('input');
+  inputToken.setAttribute('type', 'hidden');
+  inputToken.name = 'csrfmiddlewaretoken';
+  inputToken.value = '{{ csrf_token }}';
+  form.appendChild(event_id);
+  form.appendChild(rsvp_choice);
+  form.appendChild(dish_id);
+  form.appendChild(inputToken);
+  document.body.appendChild(form);
+  form.submit();
+}
 </script>
 

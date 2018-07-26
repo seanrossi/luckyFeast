@@ -31,7 +31,7 @@ def user_logout(request):
         browser_string = "This is a desktop browser"
         request.session['browser'] = 'desktop'
     request.session['target_view'] = 'potlucks:event_index'
-    return render(request, 'potlucks/index.html')
+    return render(request, 'potlucks/desktop/index.html')
 
 def user_auth(request):
     username = request.POST['username']
@@ -204,6 +204,7 @@ def event_rsvp_action(request):
         dish = event.assignment_set.get(id=dish_assigned)
         dish.assignment_status=True
         dish.save()
+        event.rsvp_count += 1
         instance.assignment = dish
     instance.save()
     event.save()
