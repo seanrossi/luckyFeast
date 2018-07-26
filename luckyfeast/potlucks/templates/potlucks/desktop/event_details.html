@@ -6,6 +6,28 @@
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/table-list.css' %}">
 
+<style>
+.modal {
+}
+.vertical-alignment-helper {
+    display:table;
+    height: 100%;
+    width: 100%;
+}
+.vertical-align-center {
+    /* To center vertically */
+    display: table-cell;
+    vertical-align: middle;
+}
+.modal-content {
+    /* Bootstrap sets the size of the modal in the modal-dialog class, we need to inherit it */
+    width:inherit;
+    height:inherit;
+    /* To center horizontally */
+    margin: 0 auto;
+}
+</style>
+
 <div class="container main">
 <h1>{{ event.name }}</h1>
 {% if request.user != event.host %}
@@ -31,15 +53,6 @@
     <input type="hidden" name="event_id" value="{{ event.pk }}" />
     <input type="submit" value="Cancel Event" />
     </form>
-{% else %}
-
-<form action="{% url 'potlucks:event_rsvp_change' %}" method="POST">
-{% csrf_token %}
-<input type="hidden" name="event_id" value="{{ event.pk }}" />
-<input type="radio" name="rsvp" value="2" id="radioGoing" />Going</input>
-<input type="radio" name="rsvp" value="3" id="notGoing" checked="checked" />Not Going</input>
-<br><br>
-
 {% endif %}
 
 <!--DISPLAY EVENT PARAMETERS HERE-->
@@ -85,13 +98,10 @@
     </div>
     <br>
   {% endfor %}
-{% if request.user != event.host %}
-<input type="submit" value="Change RSVP/Dish" id="submitButton"/>
-</form>
-{% endif %}
 {% if event.host == request.user %} 
   <div class="row">
-    <div class="col-sm-6 col-xs-12" style="text-align:center; background-color:aquamarine; display:inline-block;" onclick="addDish('{{ event.pk }}');">
+    <!--<div class="col-sm-6 col-xs-12" style="text-align:center; background-color:aquamarine; display:inline-block;" onclick="addDish('{{ event.pk }}');">-->
+    <div class="col-sm-6 col-xs-12" style="text-align:center; background-color:aquamarine; display:inline-block;" data-toggle="modal" data-target="#dishModal" >
       <h5><span class="glyphicon glyphicon-plus"/></h5>
     </form>
     </div>
@@ -123,7 +133,8 @@
 {% endfor %}
 {% if event.host == request.user %} 
   <div class="row">
-    <div class="col-sm-6 col-xs-12" style="text-align:center; background-color:aquamarine; display:inline-block;" onclick="addGuest('{{ event.pk }}');">
+    <!--<div class="col-sm-6 col-xs-12" style="text-align:center; background-color:aquamarine; display:inline-block;" onclick="addGuest('{{ event.pk }}');">-->
+    <div class="col-sm-6 col-xs-12" style="text-align:center; background-color:aquamarine; display:inline-block;" data-toggle="modal" data-target="#guestModal">
       <h5><span class="glyphicon glyphicon-plus"/></h5>
     </div>
   </div>
@@ -131,6 +142,59 @@
 </div>
 </div>
 </div>
+
+<!-- Define modal for adding dishes -->
+<div id="dishModal" class="modal modal" role="dialog" >
+  <div class="vertical-alignment-helper">
+  <div class="modal-dialog vertical-align-center">
+    <div class="modal-content">
+    <div class="modal-header">
+      <h3>Add Dish</h3>
+    </div>
+      <form action="{% url 'potlucks:event_add_dish' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="event_id" value="{{ event.pk }}"/>
+        <select name="dish_main" id="dish_main_choice" onchange="updateSubTypes()"/>
+        {% for type in dish_types %}
+          <option value={{ type.main_type }}:Any> {{ type.main_type }}: Any</option>
+          {% for sub_type in type.dish_type_sub_set.all %}
+            <option value={{ type.main_type }}:{{ sub_type.sub_type }}>{{ type.main_type }}: {{ sub_type.sub_type }}</option>
+          {% endfor %}
+        {% endfor %}
+        </select>
+        <input type="submit" value="Add Dish"/>
+      </form>
+    <div class="modal-footer">
+      <button data-dismiss="modal" style="float:left;">Close</button>
+    </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- Define modal for adding guests -->
+<div id="guestModal" class="modal" role="dialog" >
+  <div class="vertical-alignment-helper">
+  <div class="modal-dialog vertical-align-center">
+    <div class="modal-content">
+    <div class="modal-header">
+      <h3>Invite Guest</h3>
+    </div>
+    <form action="{% url 'potlucks:event_enter_guest' %}" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="id" value="{{ event.pk }}" />
+        <label for="emailInput">Email:</label>
+        <input type="text" name="email" id="emailLabel"/>
+        <input type="submit" value="Invite Guest" />
+    </form>
+    <div class="modal-footer">
+      <button data-dismiss="modal" style="float:left;">Close</button>
+    </div>
+    </div>
+  </div>
+  </div>
+</div>
+
 
 <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
 <script>

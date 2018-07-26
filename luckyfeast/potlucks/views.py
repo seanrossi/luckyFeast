@@ -104,10 +104,11 @@ def event_details(request):
     event = Event.objects.get(pk=event_id)
     user_dishes = Dish_Type_Main.objects.all()
     if event.host != user:
-      guest_instance = Guest_Instance.objects.get(event=event, guest=user)
-      context = {'event': event, 'guest_instance': guest_instance}
+        guest_instance = Guest_Instance.objects.get(event=event, guest=user)
+        context = {'event': event, 'guest_instance': guest_instance}
     else:
-        context = {'event': event}
+    	dish_types = Dish_Type_Main.objects.all()
+    	context = {'event': event, 'dish_types':dish_types}
     return render(request, 'potlucks/desktop/event_details.html', context)
 
 #VIEW TO RENDER AFTER USER SUBMITS EVENT PARAMETERS
