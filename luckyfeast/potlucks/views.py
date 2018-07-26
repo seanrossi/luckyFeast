@@ -136,7 +136,7 @@ def event_enter(request):
         event.event_key = request.POST['event_key']
         event.save()
     dish_types = Dish_Type_Main.objects.all()
-    context = {'event': event}
+    context = {'event': event, 'dish_types': dish_types}
     return render(request, 'potlucks/desktop/event_details.html', context)
 
 def event_cancel(request):
