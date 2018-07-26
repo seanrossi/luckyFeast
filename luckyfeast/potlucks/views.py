@@ -255,7 +255,8 @@ def event_add_dish(request):
     dish_added = request.POST['dish_main']
     event = Event.objects.get(pk=event_id)
     event.assignment_set.create(dish_type=dish_added)
-    context = {'event': event}
+    dish_types = Dish_Type_Main.objects.all()
+    context = {'event': event, 'dish_types': dish_types}
     return render( request, 'potlucks/desktop/event_details.html', context);
 
 def event_remove_dish(request):
@@ -265,7 +266,8 @@ def event_remove_dish(request):
     event = Event.objects.get(pk=event_id)
     dish = event.assignment_set.get(id=dish_removed)
     dish.delete()
-    context = {'event': event}
+    dish_types = Dish_Type_Main.objects.all()
+    context = {'event': event, 'dish_types': dish_types}
     return render( request, 'potlucks/desktop/event_details.html', context);
 
 def event_assign_dish(request):
@@ -279,7 +281,8 @@ def event_assign_dish(request):
     guest_instance=event.guest_instance_set.get(guest=user)
     guest_instance.assignment=dish
     guest_instance.save()
-    context = {'event': event}
+    dish_types = Dish_Type_Main.objects.all()
+    context = {'event': event, 'dish_types': dish_types}
     return render( request, 'potlucks/desktop/event_details.html', context);
 
 def event_enter_guest(request):
@@ -298,7 +301,8 @@ def event_enter_guest(request):
     #    'srossi455@gmail.com',
     #    [guest_email]
     #)
-    context = {'event': event}
+    dish_types = Dish_Type_Main.objects.all()
+    context = {'event': event, 'dish_types': dish_types}
     return render(request, 'potlucks/desktop/event_details.html', context)
 
 # Create your views here.
