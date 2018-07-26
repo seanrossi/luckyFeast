@@ -146,7 +146,7 @@ def event_cancel(request):
     event_list = user.event_set.all()
     invited_list = user.guest_instance_set.all()
     context = {'event_list': event_list, 'invited_list': invited_list}
-    return render(request, 'potlucks/' + request.session['browser'] + '/event_index.html', context)
+    return render(request, 'potlucks/desktop/event_index.html', context)
 
 def event_from_key(request):
     return render(request, 'potlucks/desktop/event_from_key.html')
