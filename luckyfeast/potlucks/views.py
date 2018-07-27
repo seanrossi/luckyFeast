@@ -152,9 +152,9 @@ def event_from_key(request):
     return render(request, 'potlucks/desktop/event_from_key.html')
 
 def event_find(request):
-    if Event.objects.filter(event_key=request.POST['event_key']).exists():
-        event = Event.objects.get(event_key=request.POST['event_key'])
-        if event.host.first_name == request.POST['host_name']:
+    if Event.objects.filter(event_key__iexact=request.POST['event_key']).exists():
+        event = Event.objects.get(event_key__iexact=request.POST['event_key'])
+        if event.host.first_name.lower() == request.POST['host_name'].lower():
             return render(request, 'potlucks/desktop/event_rsvp_invite.html', {'event': event})
         else:
             context = {'error_message': 'Incorrect host'}
