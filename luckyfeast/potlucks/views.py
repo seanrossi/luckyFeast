@@ -233,7 +233,7 @@ def event_rsvp_action(request):
         instance.assignment = dish
     instance.save()
     event.save()
-    context = {'event': event, 'guest_instance': instance}
+    context = {'event': event, 'guest_instance': instance, 'tallies': tally}
     return render(request, 'potlucks/desktop/event_details.html', context)
 
 def event_rsvp_change(request):
