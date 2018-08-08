@@ -27,10 +27,28 @@ class Dish_Type_Sub(models.Model):
     def __str__(self):
         return self.main_type.main_type + ":" + self.sub_type
 
+class Event_Dish_Tally(models.Model):
+    tally_id = models.AutoField
+    tally_id.primary_key=True
+    app_needed = models.IntegerField(default=0) 
+    app_assigned = models.IntegerField(default=0) 
+    soup_needed = models.IntegerField(default=0) 
+    soup_assigned = models.IntegerField(default=0) 
+    salad_needed = models.IntegerField(default=0) 
+    salad_assigned = models.IntegerField(default=0) 
+    entree_needed = models.IntegerField(default=0) 
+    entree_assigned = models.IntegerField(default=0) 
+    dessert_needed = models.IntegerField(default=0) 
+    dessert_assigned = models.IntegerField(default=0) 
+    beverage_needed = models.IntegerField(default=0) 
+    beverage_assigned = models.IntegerField(default=0) 
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+
 class Assignment(models.Model):
     dish_id = models.AutoField
     dish_id = primary_key=True
     dish_type = models.CharField(max_length=20, default="")
+    dish_name = models.CharField(max_length=20, default="")
     assignment_status = models.BooleanField(default=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
 

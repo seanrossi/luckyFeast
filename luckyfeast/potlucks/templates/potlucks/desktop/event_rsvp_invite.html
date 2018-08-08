@@ -4,6 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'potlucks/forms.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'potlucks/table-list.css' %}">
 
 <style>
@@ -17,6 +18,24 @@
   font-weight: bold;
 }
 .bluBtn:hover{ background-color: mediumturquoise; }
+
+.dishInfo{
+  padding-top:4px;
+  font-size:24px;
+}
+
+.dishInfo:hover{ background-color: mediumturquoise; }
+
+.assign {
+    font-size: 20px;
+    border-radius: 5px;
+    border: solid green 1px;
+    background: linear-gradient(lawngreen, green);
+    color: white;
+    font-weight: bold;
+    text-align:center;
+}
+
 </style>
 
 <div class="container" style="padding-top: 70px">
@@ -82,20 +101,71 @@
   <div class="row"><div class="col-sm-6 col-sm-offset-10">
   <h3>Bring which dish?</h3></div></div>
   <br>
-  {% for dish in event.assignment_set.all %}
-    {% if not dish.assignment_status %}
-    <div class="row">
-      <div class="col-xs-8 col-sm-offset-8 bluBtn" onclick="rsvpActionYes('{{ event.pk }}', '{{ dish.pk }}');">
-      <h5>{{ dish.dish_type }}</h5>
-      </div>
+  <div class="row">
+    <div class="col-sm-6 col-xs-8 col-sm-offset-8 col-xs-offset-2 dishInfo" onclick="showDishName('Appetizer');" style="display:block;">
+      <div class="col-sm-6 col-xs-8 col-sm-offset-4 col-xs-offset-0"><p>Appetizers</p></div>
+      <div class="col-xs-2"><p id="appCount">{{ tallies.app_assigned }}/{{ tallies.app_needed }}</p></div>
     </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm-6 col-xs-8 col-sm-offset-8 col-xs-offset-2 dishInfo" onclick="showDishName('Soup');" style="display:block;">
+      <div class="col-sm-6 col-xs-8 col-sm-offset-4 col-xs-offset-0"><p>Soups</p></div>
+      <div class="col-xs-2"><p>{{ tallies.soup_assigned }}/{{ tallies.soup_needed }}</p></div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm-6 col-xs-8 col-sm-offset-8 col-xs-offset-2 dishInfo" onclick="showDishName('Salad');" style="display:block;">
+      <div class="col-sm-6 col-xs-8 col-sm-offset-4 col-xs-offset-0"><p>Salads</p></div>
+      <div class="col-xs-2"><p>{{ tallies.salad_assigned }}/{{ tallies.salad_needed }}</p></div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm-6 col-xs-8 col-sm-offset-8 col-xs-offset-2 dishInfo" onclick="showDishName('Entre');" style="display:block;">
+      <div class="col-sm-6 col-xs-8 col-sm-offset-4 col-xs-offset-0"><p>Entrees</p></div>
+      <div class="col-xs-2"><p>{{ tallies.entree_assigned }}/{{ tallies.entree_needed }}</p></div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm-6 col-xs-8 col-sm-offset-8 col-xs-offset-2 dishInfo" onclick="showDishName('Dessert');" style="display:block;">
+      <div class="col-sm-6 col-xs-8 col-sm-offset-4 col-xs-offset-0"><p>Desserts</p></div>
+      <div class="col-xs-2"><p>{{ tallies.dessert_assigned }}/{{ tallies.dessert_needed }}</p></div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm-6 col-xs-8 col-sm-offset-8 col-xs-offset-2 dishInfo" onclick="showDishName('Beverage');" style="display:block;">
+      <div class="col-sm-6 col-xs-8 col-sm-offset-4 col-xs-offset-0"><p>Beverages</p></div>
+      <div class="col-xs-2"><p>{{ tallies.beverage_assigned }}/{{ tallies.beverage_needed }}</p></div>
+    </div>
+  </div>
+
+
     <br>
-    {% endif %}
-  {% endfor %}
   </div>
 </div>
 </div>
 
+
+<div class="row">
+<div class="col-sm-6 col-xs-12 col-sm-offset-4 col-xs-offset-0" id="dishField" style="display:none;">
+  <form method="POST" action="{% url 'potlucks:event_rsvp_action' %}">
+  {% csrf_token %}
+  <input type="hidden" name="rsvp" value="2"/>
+  <input type="hidden" name="event_id" value="{{ event.pk }}"/>
+  <input type="hidden" name="dish_type"/>
+  <div class="row">
+    <input class="col-sm-4 col-xs-8 col-sm-offset-2 col-xs-offset-2" type="text" name="dish_name" placeholder="Enter dish name" id="dishText"/>
+  </div>
+  <div class="row">
+    <input class="col-sm-4 col-xs-8 col-sm-offset-2 col-xs-offset-2 assign" type="submit" value="SUBMIT"/>
+  </div>
+  </form>
+</div>
+</div>
 
 <!--TABLE DISPLAY FOR GUEST LIST-->
 <div class="col-sm-6">
@@ -122,6 +192,10 @@
 
 <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'></script>
 <script>
+
+  var appetizerCount = {{ tallies.app_needed }};
+  var appetizerHave = {{ tallies.app_assigned }};
+
   $(document).ready(function()
   {
     $("#radioGoing").change(function()
@@ -149,6 +223,7 @@
     $("#rsvpYes").click(function(){
       $("#dishDiv").show();
     });
+    $("#appCount").html( appetizerHave + '/' + appetizerCount );
   });
 
 function rsvpActionNo( eventId ){
@@ -200,6 +275,12 @@ function rsvpActionYes( eventId, dishId ){
   form.appendChild(inputToken);
   document.body.appendChild(form);
   form.submit();
+}
+
+function showDishName( dish )
+{
+  $("#dishField").show();
+  $('input[name="dish_type"]').val(dish);
 }
 </script>
 

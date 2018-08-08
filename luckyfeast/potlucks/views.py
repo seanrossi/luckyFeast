@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
-from .models import Event, Dish_Type_Main, Guest_Instance
+from .models import Event, Dish_Type_Main, Guest_Instance, Event_Dish_Tally, Assignment
 import datetime
 
 def index(request):
@@ -103,12 +103,13 @@ def event_details(request):
     event_id = request.POST['event_id']
     event = Event.objects.get(pk=event_id)
     user_dishes = Dish_Type_Main.objects.all()
+    dish_tallies = Event_Dish_Tally.objects.get(event=event)
     if event.host != user:
         guest_instance = Guest_Instance.objects.get(event=event, guest=user)
-        context = {'event': event, 'guest_instance': guest_instance}
+        context = {'event': event, 'guest_instance': guest_instance, 'tallies': dish_tallies}
     else:
     	dish_types = Dish_Type_Main.objects.all()
-    	context = {'event': event, 'dish_types':dish_types}
+    	context = {'event': event, 'dish_types':dish_types, 'tallies': dish_tallies}
     return render(request, 'potlucks/desktop/event_details.html', context)
 
 #VIEW TO RENDER AFTER USER SUBMITS EVENT PARAMETERS
@@ -136,6 +137,8 @@ def event_enter(request):
         event.event_key = request.POST['event_key']
         event.save()
     dish_types = Dish_Type_Main.objects.all()
+    e_t = event.event_dish_tally_set.create()
+    e_t.save()
     context = {'event': event, 'dish_types': dish_types}
     return render(request, 'potlucks/desktop/event_details.html', context)
 
@@ -155,7 +158,8 @@ def event_find(request):
     if Event.objects.filter(event_key__iexact=request.POST['event_key']).exists():
         event = Event.objects.get(event_key__iexact=request.POST['event_key'])
         if event.host.first_name.lower() == request.POST['host_name'].lower():
-            return render(request, 'potlucks/desktop/event_rsvp_invite.html', {'event': event})
+            dish_tallies = Event_Dish_Tally.objects.get(event=event)
+            return render(request, 'potlucks/desktop/event_rsvp_invite.html', {'event': event, 'tallies': dish_tallies})
         else:
             context = {'error_message': 'Incorrect host'}
     else:
@@ -170,7 +174,8 @@ def event_rsvp_invite(request):
         context = {'error_message': "Please login before you continue"}
         return render(request, 'potlucks/desktop/user_login.html', context)
     event = Event.objects.get(pk=event_id)
-    context = {'event': event}
+    dish_tallies = Event_Dish_Tally.objects.get(event=event)
+    context = {'event': event, 'tallies': dish_tallies}
     return render(request, 'potlucks/desktop/event_rsvp_invite.html', context)
 
 def event_rsvp_action(request):
@@ -179,7 +184,8 @@ def event_rsvp_action(request):
         request.session['target_view'] = 'potlucks:event_rsvp_action'
         request.session['rsvp'] = request.POST.get('rsvp', '')
         if request.session['rsvp'] == '2':
-            request.session['dish_id'] = request.POST['dish_id']
+            request.session['dish_type'] = request.POST['dish_type']
+            request.session['dish_name'] = request.POST['dish_name']
         context = {'error_message': "Please login before you continue"}
         return render(request, 'potlucks/desktop/user_login.html', context)
     
@@ -191,6 +197,8 @@ def event_rsvp_action(request):
 
     if not event.guest_instance_set.filter(email=user.email).exists():
         event.guest_instance_set.create(email=user.email, guest=user)
+    else:
+        return HttpResponseRedirect(reverse('potlucks:event_index'))
     instance = event.guest_instance_set.get(email=user.email)
     if 'rsvp' not in request.POST:
         rsvp = request.session['rsvp']
@@ -198,10 +206,27 @@ def event_rsvp_action(request):
         rsvp = request.POST['rsvp']
     instance.rsvp_status=int(rsvp)
     if rsvp == '2':
-        dish_assigned = request.POST.get('dish_id', '')
+        dish_assigned = request.POST.get('dish_type', '')
         if dish_assigned == '':
-            dish_assigned = request.session['dish_id']
-        dish = event.assignment_set.get(id=dish_assigned)
+            dish_assigned = request.session['dish_type']
+        dish_name = request.POST.get('dish_name', '')
+        if dish_name == '':
+            dish_name = request.session['dish_name']
+        tally = Event_Dish_Tally.objects.get(event=event)
+        if dish_assigned == 'Appetizer':
+            tally.app_assigned += 1
+        if dish_assigned == 'Soup':
+            tally.soup_assigned += 1
+        if dish_assigned == 'Salad':
+            tally.salad_assigned += 1
+        if dish_assigned == 'Entree':
+            tally.entree_assigned += 1
+        if dish_assigned == 'Dessert':
+            tally.dessert_assigned += 1
+        if dish_assigned == 'Beverage':
+            tally.beverage_assigned += 1
+        tally.save()
+        dish = Assignment( dish_type=dish_assigned, dish_name=dish_name, event=event)
         dish.assignment_status=True
         dish.save()
         event.rsvp_count += 1
@@ -259,6 +284,28 @@ def event_add_dish(request):
     dish_types = Dish_Type_Main.objects.all()
     context = {'event': event, 'dish_types': dish_types}
     return render( request, 'potlucks/desktop/event_details.html', context);
+
+def event_add_dish_tallies(request):
+    user = request.user
+    event_id = request.POST['event_id']
+    event = Event.objects.get(pk=event_id)
+    app_count = request.POST['app_count']
+    user_dishes = Dish_Type_Main.objects.all()
+    dish_tallies = Event_Dish_Tally.objects.get(event=event)
+    dish_tallies.app_needed = int(request.POST['app_count'])
+    dish_tallies.soup_needed = int(request.POST['soup_count'])
+    dish_tallies.salad_needed = int(request.POST['salad_count'])
+    dish_tallies.entree_needed = int(request.POST['entree_count'])
+    dish_tallies.dessert_needed = int(request.POST['dessert_count'])
+    dish_tallies.beverage_needed = int(request.POST['beverage_count'])
+    dish_tallies.save()
+    if event.host != user:
+        guest_instance = Guest_Instance.objects.get(event=event, guest=user)
+        context = {'event': event, 'guest_instance': guest_instance, 'tallies': dish_tallies}
+    else:
+    	dish_types = Dish_Type_Main.objects.all()
+    	context = {'event': event, 'dish_types':dish_types, 'tallies': dish_tallies}
+    return render(request, 'potlucks/desktop/event_details.html', context);
 
 def event_remove_dish(request):
     user = request.user
