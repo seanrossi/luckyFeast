@@ -26,6 +26,17 @@
 
 .dishInfo:hover{ background-color: mediumturquoise; }
 
+.cancel {
+    font-size: 20px;
+    border-radius: 5px;
+    border: solid #F5A623 1px;
+    background: linear-gradient(#FAD961, #F67B1C);
+    color: white;
+    font-weight: bold;
+    text-align:center;
+    padding: 2px;
+}
+
 .assign {
     font-size: 20px;
     border-radius: 5px;
@@ -34,6 +45,7 @@
     color: white;
     font-weight: bold;
     text-align:center;
+    padding: 2px;
 }
 
 </style>
@@ -65,21 +77,25 @@
 </div>
 
 <br>
-<div class="row">
-<div class="col-sm-6 col-sm-offset-3">
-<div class="row">
-  <h3 class="col-sm-2 col-sm-offset-5">Going?</h3>
+<div class="row" id="rsvpGoing">
+<div class="col-sm-6 col-xs-12 col-sm-offset-3 col-xs-offset-0">
+<div class="row" >
+  <h3 class="col-sm-2 col-xs-12 col-sm-offset-5">Going?</h3>
 </div>
 <br>
-  <div class="col-xs-6 bluBtn" id="rsvpNo" onclick="rsvpActionNo('{{ event.pk }}');">
-    <h5>No</h5>
+<div class="row">
+  <div class="col-xs-4 col-xs-offset-4 cancel" id="rsvpNo" onclick="rsvpActionNo('{{ event.pk }}');">
+    No
   </div>
-  <div class="col-xs-6 bluBtn" id="rsvpYes">
-    <h5>Yes</h5>
+</div>
+  <br>
+<div class="row">
+  <div class="col-xs-4 col-xs-offset-4 assign" id="rsvpYes">
+    Yes
   </div>
 </div>
 </div>
-<br>
+</div>
 <!--TABLE DISPLAY FOR DISH ASSIGNMENT LIST-->
 <!--<div class="row">
 <div class="col-sm-6">
@@ -98,8 +114,8 @@
 <!--TABLE DISPLAY FOR DISH ASSIGNMENT LIST-->
 <div class="row">
 <div class="col-sm-6" id="dishDiv" style="display:none;">
-  <div class="row"><div class="col-sm-6 col-sm-offset-10">
-  <h3>Bring which dish?</h3></div></div>
+  <div class="row"><div class="col-sm-6 col-sm-offset-9">
+  <h3>What are you bringing?</h3></div></div>
   <br>
   <div class="row">
     <div class="col-sm-6 col-xs-8 col-sm-offset-8 col-xs-offset-2 dishInfo" onclick="showDishName('Appetizer');" style="display:block;">
@@ -152,6 +168,8 @@
 
 <div class="row">
 <div class="col-sm-6 col-xs-12 col-sm-offset-4 col-xs-offset-0" id="dishField" style="display:none;">
+  <div class="row"><div class="col-sm-6 col-sm-offset-2">
+  <h3 id="dishName"></h3></div></div>
   <form method="POST" action="{% url 'potlucks:event_rsvp_action' %}">
   {% csrf_token %}
   <input type="hidden" name="rsvp" value="2"/>
@@ -160,8 +178,13 @@
   <div class="row">
     <input class="col-sm-4 col-xs-8 col-sm-offset-2 col-xs-offset-2" type="text" name="dish_name" placeholder="Enter dish name" id="dishText"/>
   </div>
+  <br>
   <div class="row">
-    <input class="col-sm-4 col-xs-8 col-sm-offset-2 col-xs-offset-2 assign" type="submit" value="SUBMIT"/>
+    <div class="col-sm-4 col-xs-8 col-sm-offset-2 col-xs-offset-2 assign" id="dishNext">NEXT</div></div>
+  <div class="row">
+    <div class="col-sm-4 col-xs-8 col-sm-offset-2 col-xs-offset-2" id="dishTaken">Dish Available</div></div>
+  <div class="row">
+    <input class="col-sm-4 col-xs-8 col-sm-offset-2 col-xs-offset-2 assign" id="dishSubmit" type="submit" value="SUBMIT" style="display:none;" disabled/>
   </div>
   </form>
 </div>
@@ -221,9 +244,45 @@
     });
 
     $("#rsvpYes").click(function(){
+      $("#rsvpNo").hide();
+      $("#rsvpYes").hide();
+      $("#rsvpGoing").hide();
       $("#dishDiv").show();
     });
     $("#appCount").html( appetizerHave + '/' + appetizerCount );
+
+    $("#dishNext").click(function(){
+      var dish = $("#dishText").val().trim();
+      if(dish.length >= 0)
+      {
+      $("#dishTaken").show();
+            
+      $.ajax(
+      {
+        url: '/ajax/validate_dish',
+        data: 
+        {
+          'eventpk': {{ event.pk }},
+          'dish': dish
+        },
+        datatype: 'json',
+        success: function(data)
+        {
+          if(data.in_use)
+          {
+            $("#dishTaken").html("<b>Somebody is already bringing that. You may want to bring something else.</b>").css("color", "red");       
+            //$("input[type=submit]").prop("disabled", true);  
+          }
+          else
+          {
+            $("#dishTaken").html("<b>Awesome! Nobody is bringing that yet.</b>").css("color", "green");     
+            //$("input[type=submit]").removeAttr("disabled");  
+          }
+        }
+      });
+      $("#dishSubmit").show();
+    }
+    });
   });
 
 function rsvpActionNo( eventId ){
@@ -280,6 +339,8 @@ function rsvpActionYes( eventId, dishId ){
 function showDishName( dish )
 {
   $("#dishField").show();
+  $("#dishName").html("What is your " + dish + "?");
+  $("#dishDiv").hide();
   $('input[name="dish_type"]').val(dish);
 }
 </script>

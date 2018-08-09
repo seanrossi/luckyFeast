@@ -149,6 +149,16 @@ def validate_event_key(request):
     }
     return JsonResponse(data)
 
+def validate_dish(request):
+    event_pk = request.GET.get('eventpk', None)
+    dish = request.GET.get('dish', None)
+    event = Event.objects.get(pk=event_pk)
+    dish_list = event.guest_instance_set.all()
+    data = {
+        'in_use': dish_list.filter(assignment__dish_name__iexact=dish).exists()
+    }
+    return JsonResponse(data)
+
 def event_cancel(request):
     event_id = request.POST['event_id']
     Event.objects.get(pk=event_id).delete()
@@ -240,6 +250,7 @@ def event_rsvp_action(request):
         instance.assignment = dish
     instance.save()
     event.save()
+    tally = Event_Dish_Tally.objects.get(event=event)
     context = {'event': event, 'guest_instance': instance, 'tallies': tally}
     return render(request, 'potlucks/desktop/event_details.html', context)
 
