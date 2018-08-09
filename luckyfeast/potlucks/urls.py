@@ -30,4 +30,5 @@ urlpatterns = [
     path('event_add_dish_tallies', views.event_add_dish_tallies, name='event_add_dish_tallies'),
     path('key/', views.event_from_key, name='event_from_key'),
     url(r'^ajax/validate_username/$', views.validate_username, name='validate_username'),
+    url(r'^ajax/validate_event_key/$', views.validate_event_key, name='validate_event_key'),
 ]

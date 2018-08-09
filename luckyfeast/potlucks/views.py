@@ -137,10 +137,17 @@ def event_enter(request):
         event.event_key = request.POST['event_key']
         event.save()
     dish_types = Dish_Type_Main.objects.all()
-    e_t = event.event_dish_tally_set.create()
-    e_t.save()
-    context = {'event': event, 'dish_types': dish_types}
+    tallies = event.event_dish_tally_set.create()
+    tallies.save()
+    context = {'event': event, 'dish_types': dish_types, 'tallies': tallies}
     return render(request, 'potlucks/desktop/event_details.html', context)
+
+def validate_event_key(request):
+    event_key = request.GET.get('eventkey', None)
+    data = {
+        'in_use': Event.objects.filter(event_key__iexact=event_key).exists()
+    }
+    return JsonResponse(data)
 
 def event_cancel(request):
     event_id = request.POST['event_id']

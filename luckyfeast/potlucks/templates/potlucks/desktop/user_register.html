@@ -31,10 +31,10 @@
     <ul>
         <!--Each input has a title, a help hover key, and a helper message-->
         <li><b>First Name:</b><br>
-        <input type="text" name="firstname" /></li>
+        <input type="text" name="firstname" pattern="[A-Za-z]+" title="Letters only" required /></li>
     
         <li><b>Last Name:</b><br>
-        <input type="text" name="lastname" /></li>
+        <input type="text" name="lastname" pattern="[A-Za-z]+" title="Letters only" required/></li>
     
         <li><b>Username:</b><br>
         <div class="forms-input">
@@ -47,7 +47,7 @@
         <li><b>Email:</b><br>
         <input type="text" name="email" required/></li>
     
-        <li><input id="register_btn" type="submit" value="Register" /></li>
+        <li><input id="register_btn" type="submit" value="Register" disabled/></li>
 </form>
 </div>
 </div>
@@ -79,10 +79,12 @@ $(document).ready(function()
           if(data.in_use)
           {
             $("#nameAvailable").html("<b>Username is already taken</b>").css("color", "red");       
+            $("input[type=submit]").prop("disabled", true);
           }
           else
           {
             $("#nameAvailable").html("<b>Username is available</b>").css("color", "green");       
+            $("input[type=submit]").removeAttr("disabled");
           }
         }
       });
@@ -91,6 +93,7 @@ $(document).ready(function()
     {
       $("#nameAvailable").show();
       $("#nameAvailable").html("<b>Username is too short</b>").css("color", "red");       
+      $("input[type=submit]").prop("disabled", true);
     }
   });
 });
