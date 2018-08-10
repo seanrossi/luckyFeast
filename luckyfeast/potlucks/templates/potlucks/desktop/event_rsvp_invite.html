@@ -268,6 +268,7 @@
         datatype: 'json',
         success: function(data)
         {
+          $("input[type=submit]").removeAttr("disabled");  
           if(data.in_use)
           {
             $("#dishTaken").html("<b>Somebody is already bringing that. You may want to bring something else.</b>").css("color", "red");       
@@ -276,7 +277,6 @@
           else
           {
             $("#dishTaken").html("<b>Awesome! Nobody is bringing that yet.</b>").css("color", "green");     
-            //$("input[type=submit]").removeAttr("disabled");  
           }
         }
       });
