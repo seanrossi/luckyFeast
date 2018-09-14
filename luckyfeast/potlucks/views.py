@@ -159,6 +159,23 @@ def validate_dish(request):
     }
     return JsonResponse(data)
 
+def update_dish_tallies(request):
+    event_pk = request.GET.get('eventpk', None)
+    event = Event.objects.get(pk=event_pk)
+    dish_tallies = Event_Dish_Tally.objects.get(event=event)
+    dish_tallies.app_needed = int(request.GET.get('app_needed', 0))
+    dish_tallies.soup_needed = int(request.GET.get('soup_needed', 0))
+    dish_tallies.salad_needed = int(request.GET.get('salad_needed', 0))
+    dish_tallies.entree_needed = int(request.GET.get('entree_needed', 0))
+    dish_tallies.dessert_needed = int(request.GET.get('dessert_needed', 0))
+    dish_tallies.beverage_needed = int(request.GET.get('beverage_needed', 0))
+    dish_tallies.save()
+
+    data = {
+        'success': True
+    }
+    return JsonResponse(data)
+
 def event_cancel(request):
     event_id = request.POST['event_id']
     Event.objects.get(pk=event_id).delete()

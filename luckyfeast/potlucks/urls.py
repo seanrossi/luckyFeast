@@ -32,4 +32,5 @@ urlpatterns = [
     url(r'^ajax/validate_username/$', views.validate_username, name='validate_username'),
     url(r'^ajax/validate_event_key/$', views.validate_event_key, name='validate_event_key'),
     url(r'^ajax/validate_dish/$', views.validate_dish, name='validate_dish'),
+    url(r'^ajax/update_dish_tallies/$', views.update_dish_tallies, name='update_dish_tallies'),
 ]

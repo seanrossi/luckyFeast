@@ -354,11 +354,11 @@
     $("#appMinus").click(function() {
       if( appetizerCount > 0 )
         appetizerCount--;
-      $("#appCount").html(appetizerCount);
+      $("#appCount").html(appetizerHave + '/' + appetizerCount);
     });
     $("#appPlus").click(function() {
       appetizerCount++;
-      $("#appCount").html(appetizerCount);
+      $("#appCount").html(appetizerHave + '/' + appetizerCount);
     });
     //END BLOCK FOR APPETIZERS
     //BLOCK FOR SOUPS
@@ -366,11 +366,11 @@
     $("#soupMinus").click(function() {
       if( soupCount > 0 )
         soupCount--;
-      $("#soupCount").html(soupCount);
+      $("#soupCount").html(soupHave + '/' + soupCount);
     });
     $("#soupPlus").click(function() {
       soupCount++;
-      $("#soupCount").html(soupCount);
+      $("#soupCount").html(soupHave + '/' + soupCount);
     });
     //END BLOCK FOR SOUPS
     //BLOCK FOR SALADS
@@ -378,11 +378,11 @@
     $("#saladMinus").click(function() {
       if( saladCount > 0 )
         saladCount--;
-      $("#saladCount").html(saladCount);
+      $("#saladCount").html(saladHave + '/' + saladCount);
     });
     $("#saladPlus").click(function() {
       saladCount++;
-      $("#saladCount").html(saladCount);
+      $("#saladCount").html(saladHave + '/' + saladCount);
     });
     //END BLOCK FOR SALADS
     //BLOCK FOR ENTREES
@@ -390,11 +390,11 @@
     $("#entreeMinus").click(function() {
       if( entreeCount > 0 )
         entreeCount--;
-      $("#entreeCount").html(entreeCount);
+      $("#entreeCount").html(entreeHave + '/' + entreeCount);
     });
     $("#entreePlus").click(function() {
       entreeCount++;
-      $("#entreeCount").html(entreeCount);
+      $("#entreeCount").html(entreeHave + '/' + entreeCount);
     });
     //END BLOCK FOR ENTREES
     //BLOCK FOR DESSERTS
@@ -402,11 +402,11 @@
     $("#dessertMinus").click(function() {
       if( dessertCount > 0 )
         dessertCount--;
-      $("#dessertCount").html(dessertCount);
+      $("#dessertCount").html(dessertHave + '/' + dessertCount);
     });
     $("#dessertPlus").click(function() {
       dessertCount++;
-      $("#dessertCount").html(dessertCount);
+      $("#dessertCount").html(dessertHave + '/' + dessertCount);
     });
     //END BLOCK FOR DESSERTS
     //BLOCK FOR BEVERAGES
@@ -414,11 +414,11 @@
     $("#beverageMinus").click(function() {
       if( beverageCount > 0 )
         beverageCount--;
-      $("#beverageCount").html(beverageCount);
+      $("#beverageCount").html(beverageHave + '/' + beverageCount);
     });
     $("#beveragePlus").click(function() {
       beverageCount++;
-      $("#beverageCount").html(beverageCount);
+      $("#beverageCount").html(beverageHave + '/' + beverageCount);
     });
     //END BLOCK FOR BEVERAGES
       });
@@ -441,53 +441,44 @@ function allowEdit()
       $("#editBtn").hide();
 }
 
+function disableEdit()
+{
+      $("#appMinus").hide();
+      $("#appPlus").hide();
+      $("#soupMinus").hide();
+      $("#soupPlus").hide();
+      $("#saladMinus").hide();
+      $("#saladPlus").hide();
+      $("#entreeMinus").hide();
+      $("#entreePlus").hide();
+      $("#dessertMinus").hide();
+      $("#dessertPlus").hide();
+      $("#beverageMinus").hide();
+      $("#beveragePlus").hide();
+      $("#assignBtn").hide();
+      $("#editBtn").show();
+}
+
 function addDishTallies()
 {
-  var form = document.createElement('form');
-  form.setAttribute('method', 'POST');
-  form.setAttribute('action', "{% url 'potlucks:event_add_dish_tallies' %} ");
-  var eventInput = document.createElement('input');
-  eventInput.setAttribute('type', 'hidden');
-  eventInput.setAttribute('name', 'event_id');
-  eventInput.setAttribute('value', '{{ event.pk }}');
-  var appInput = document.createElement('input');
-  appInput.setAttribute('type', 'hidden');
-  appInput.setAttribute('name', 'app_count');
-  appInput.setAttribute('value', appetizerCount);
-  var soupInput = document.createElement('input');
-  soupInput.setAttribute('type', 'hidden');
-  soupInput.setAttribute('name', 'soup_count');
-  soupInput.setAttribute('value', soupCount);
-  var saladInput = document.createElement('input');
-  saladInput.setAttribute('type', 'hidden');
-  saladInput.setAttribute('name', 'salad_count');
-  saladInput.setAttribute('value', saladCount);
-  var entreeInput = document.createElement('input');
-  entreeInput.setAttribute('type', 'hidden');
-  entreeInput.setAttribute('name', 'entree_count');
-  entreeInput.setAttribute('value', entreeCount);
-  var dessertInput = document.createElement('input');
-  dessertInput.setAttribute('type', 'hidden');
-  dessertInput.setAttribute('name', 'dessert_count');
-  dessertInput.setAttribute('value', dessertCount);
-  var beverageInput = document.createElement('input');
-  beverageInput.setAttribute('type', 'hidden');
-  beverageInput.setAttribute('name', 'beverage_count');
-  beverageInput.setAttribute('value', beverageCount);
-  var inputToken = document.createElement('input');
-  inputToken.setAttribute('type', 'hidden');
-  inputToken.name = 'csrfmiddlewaretoken';
-  inputToken.value = '{{ csrf_token }}';
-  form.appendChild(eventInput);
-  form.appendChild(inputToken);
-  form.appendChild(appInput);
-  form.appendChild(soupInput);
-  form.appendChild(saladInput);
-  form.appendChild(entreeInput);
-  form.appendChild(dessertInput);
-  form.appendChild(beverageInput);
-  document.body.appendChild(form);
-  form.submit();
+  $.ajax(
+  {
+    url: '/ajax/update_dish_tallies',
+    data:
+    {
+      'eventpk': {{ event.pk }},
+      'app_needed': appetizerCount,
+      'soup_needed': soupCount,
+      'salad_needed': saladCount,
+      'entree_needed': entreeCount,
+      'dessert_needed': dessertCount,
+      'beverage_needed': beverageCount
+    },
+    datatype: 'json',
+    success: function(){}
+  });
+
+  disableEdit();
 }
 
 function addGuest( eventId )
