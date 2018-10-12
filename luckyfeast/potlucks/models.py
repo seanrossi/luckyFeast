@@ -17,6 +17,8 @@ class Event(models.Model):
     #state = models.CharField(max_length=2, default="")
     #zipcode = models.CharField(max_length=5, default="")
     rsvp_count = models.IntegerField(default=0)
+    def is_current(self):
+        return self.end_time >= timezone.now()
 
 class Dish_Type_Main(models.Model):
     main_type = models.CharField(max_length=20, default="")

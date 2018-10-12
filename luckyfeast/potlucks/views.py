@@ -86,9 +86,12 @@ def event_index(request):
         request.session['target_view'] = 'potlucks:event_index'
         return render(request, 'potlucks/desktop/user_login.html')
     user = request.user
+    #event_list = user.event_set.all()
+    now = datetime.datetime.now()
     event_list = user.event_set.all()
+    current = event_list.filter(end_time__gte = now)
     invited_list = user.guest_instance_set.all()
-    context = {'event_list': event_list, 'invited_list': invited_list}
+    context = {'event_list': current, 'invited_list': invited_list}
     return render(request, 'potlucks/desktop/event_index.html', context)
 
 def create_event(request):

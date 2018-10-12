@@ -38,6 +38,7 @@
 <div class="col-sm-6">
   <h2>Events I'm attending:</h2>
   {% for instance in invited_list %}
+  {% if instance.event.is_current %}
   <div class="row">
     <div class="col-sm-6 col-xs-12" style="background-color:palegreen; display:inline-block;" style="cursor:pointer !important;" onclick="loadEvent('{{ instance.event.pk }}');">
       <h3>{{ instance.event.name }}</h3>
@@ -49,6 +50,7 @@
     </div>
   </div>
   <br>
+{% endif %}
 {% endfor %}
 </div>
 
